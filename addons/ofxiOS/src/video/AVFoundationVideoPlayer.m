@@ -53,6 +53,7 @@ NSString * const kCurrentItemKey	= @"currentItem";
 	CMTime timestampLast;
 	CMTime duration;
     CMTime currentTime;
+    CMTime sampleTime;
     float volume;
     float speed;
     float frameRate;
@@ -107,6 +108,7 @@ static const NSString * ItemStatusContext;
         timestampLast = kCMTimeZero;
         duration = kCMTimeZero;
         currentTime = kCMTimeZero;
+        sampleTime = kCMTimeInvalid;
         volume = 1;
         speed = 1;
         frameRate = 0;
@@ -323,6 +325,7 @@ static const NSString * ItemStatusContext;
     timestampLast = kCMTimeZero;
     duration = kCMTimeZero;
     currentTime = kCMTimeZero;
+    sampleTime = kCMTimeInvalid;
 
     videoWidth = 0;
     videoHeight = 0;
@@ -408,8 +411,23 @@ static const NSString * ItemStatusContext;
         bNewFrame = NO;
         return;
     }
+
+    /**
+     *  in most cases we check at what time the video player is up to,
+     *  and use the time for sampling buffers in the code below.
+     *  but if a sampleTime is provided then we use it instead of video player time.
+     *  sampleTime is used when synchronous time is needed (video player plays asynchronously),
+     *  such as when needing to access the video frames, frame by frame.
+     *  sampleTime is cleared (invalidated) on every frame so it must be set before calling update.
+     */
+    CMTime time = kCMTimeZero;
+    if(CMTIME_IS_VALID(sampleTime)) {
+        time = sampleTime;
+        sampleTime = kCMTimeInvalid;
+    } else {
+        time = [_player currentTime];
+    }
     
-    CMTime time = [_player currentTime];
     if(bUpdateFirstFrame) {
         /**
          *  this forces the first frame to be updated.
@@ -580,6 +598,14 @@ static const NSString * ItemStatusContext;
 
 - (NSInteger)getHeight {
     return videoHeight;
+}
+
+- (void)setSampleTimeInSec:(double)time {
+    [self setSampleTime:CMTimeMakeWithSeconds(time, NSEC_PER_SEC)];
+}
+
+- (void)setSampleTime:(CMTime)time {
+    sampleTime = time;
 }
 
 - (CMTime)getCurrentTime {

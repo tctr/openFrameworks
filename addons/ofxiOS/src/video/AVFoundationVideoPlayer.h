@@ -70,6 +70,8 @@
 
 - (NSInteger)getWidth;
 - (NSInteger)getHeight;
+- (void)setSampleTimeInSec:(double)time;
+- (void)setSampleTime:(CMTime)time;
 - (CMTime)getCurrentTime;
 - (double)getCurrentTimeInSec;
 - (CMTime)getDuration;
