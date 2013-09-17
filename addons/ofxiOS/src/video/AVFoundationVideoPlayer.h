@@ -41,7 +41,8 @@
 @property (nonatomic, retain) AVPlayerItem * playerItem;
 @property (nonatomic, retain) AVAsset * asset;
 @property (nonatomic, retain) AVAssetReader * assetReader;
-@property (nonatomic, retain) AVAssetReaderOutput * assetReaderVideoOutput;
+@property (nonatomic, retain) AVAssetReaderTrackOutput * assetReaderVideoTrackOutput;
+@property (nonatomic, retain) AVAssetReaderTrackOutput * assetReaderAudioTrackOutput;
 
 - (BOOL)loadWithFile:(NSString*)file;
 - (BOOL)loadWithPath:(NSString*)path;
@@ -67,6 +68,8 @@
 - (BOOL)isFinished;
 
 - (CVImageBufferRef)getCurrentFrame;
+- (CMSampleBufferRef)getVideoSampleBuffer;
+- (CMSampleBufferRef)getAudioSampleBuffer;
 
 - (NSInteger)getWidth;
 - (NSInteger)getHeight;
