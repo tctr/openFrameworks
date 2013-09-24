@@ -327,7 +327,7 @@ static const NSString * ItemStatusContext;
         numOfChannels = 2;
     }
     
-    NSMutableDictionary * audioOutputSettings = nil;
+    NSDictionary * audioOutputSettings = nil;
     audioOutputSettings = [NSDictionary dictionaryWithObjectsAndKeys:
                            [NSNumber numberWithInt:kAudioFormatLinearPCM], AVFormatIDKey,
                            [NSNumber numberWithFloat:preferredHardwareSampleRate], AVSampleRateKey,
