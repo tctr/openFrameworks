@@ -482,6 +482,11 @@ static const NSString * ItemStatusContext;
     if(CMTIME_IS_VALID(sampleTime)) {
         time = sampleTime;
         sampleTime = kCMTimeInvalid;
+        if(CMTIME_COMPARE_INLINE(time, <, kCMTimeZero)) {
+            time = kCMTimeZero;
+        } else if(CMTIME_COMPARE_INLINE(time, >, duration)) {
+            time = duration;
+        }
     } else {
         time = [_player currentTime];
     }
