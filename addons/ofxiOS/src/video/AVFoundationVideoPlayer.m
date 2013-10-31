@@ -522,6 +522,8 @@ static const NSString * ItemStatusContext;
             audioSampleBuffer = bufferTemp; // save reference to new buffer.
             
             audioTimestamp = CMSampleBufferGetPresentationTimeStamp(audioSampleBuffer);
+        } else {
+            break;
         }
     }
     
@@ -546,6 +548,7 @@ static const NSString * ItemStatusContext;
                 // video finished.
             }
             bOk = NO;
+            break;
         }
     }
     
