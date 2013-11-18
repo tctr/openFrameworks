@@ -52,11 +52,10 @@ NSString * const kCurrentItemKey	= @"currentItem";
     CMSampleBufferRef audioSampleBuffer;
 	CMTime videoTimestamp;
 	CMTime videoTimestampLast;
+    CMTime videoTime;
     CMTime audioTimestamp;
 	CMTime duration;
     CMTime currentTime;
-    CMTime seekTime;
-    CMTime seekCurrentTime;
     CMTime sampleTime;
     float volume;
     float speed;
@@ -71,9 +70,10 @@ NSString * const kCurrentItemKey	= @"currentItem";
     BOOL bUpdateFirstFrame;
     BOOL bNewFrame;
     BOOL bPlaying;
-    bool bFinished;
+    BOOL bFinished;
     BOOL bAutoPlayOnLoad;
     BOOL bLoop;
+    BOOL bSeeking;
 }
 
 @synthesize delegate;
@@ -112,12 +112,11 @@ static const NSString * ItemStatusContext;
         audioSampleBuffer = nil;
         videoTimestamp = kCMTimeZero;
         videoTimestampLast = kCMTimeZero;
+        videoTime = kCMTimeZero;
         audioTimestamp = kCMTimeZero;
         duration = kCMTimeZero;
         currentTime = kCMTimeZero;
         sampleTime = kCMTimeInvalid;
-        seekTime = kCMTimeInvalid;
-        seekCurrentTime = kCMTimeInvalid;
         volume = 1;
         speed = 1;
         frameRate = 0;
@@ -134,6 +133,7 @@ static const NSString * ItemStatusContext;
         bFinished = NO;
         bAutoPlayOnLoad = NO;
         bLoop = NO;
+        bSeeking = NO;
     }
     return self;
 }
@@ -382,12 +382,11 @@ static const NSString * ItemStatusContext;
     
     videoTimestamp = kCMTimeZero;
     videoTimestampLast = kCMTimeZero;
+    videoTime = kCMTimeZero;
     audioTimestamp = kCMTimeZero;
     duration = kCMTimeZero;
     currentTime = kCMTimeZero;
     sampleTime = kCMTimeInvalid;
-    seekTime = kCMTimeInvalid;
-    seekCurrentTime = kCMTimeInvalid;
 
     videoWidth = 0;
     videoHeight = 0;
@@ -515,17 +514,9 @@ static const NSString * ItemStatusContext;
     currentTime = time;
     
     if(self.assetReader == nil) {
-        float timeDiff = CMTimeGetSeconds(CMTimeAbsoluteValue(CMTimeSubtract(currentTime, seekCurrentTime)));
-        float seekDiff = CMTimeGetSeconds(CMTimeAbsoluteValue(CMTimeSubtract(currentTime, seekTime)));
-
-        NSLog(@"===============================================");
-        NSLog(@"currentTime = %f", CMTimeGetSeconds(currentTime));
-        NSLog(@"seekCurrentTime = %f", CMTimeGetSeconds(seekCurrentTime));
-        NSLog(@"seekTime = %f", CMTimeGetSeconds(seekTime));
-        NSLog(@"timeDiff = %f", timeDiff);
-        NSLog(@"seekDiff = %f", seekDiff);
-        
-        if(seekDiff > timeDiff) {
+        if(bSeeking == true) {
+            // video player is seeking to new position.
+            // asset reader can only be created when seeking has finished.
             return;
         }
         
@@ -557,41 +548,37 @@ static const NSString * ItemStatusContext;
 //    }
     
     //---------------------------------------------------------- video buffer.
-    BOOL bOk = YES;
-    while(self.assetReader.status == AVAssetReaderStatusReading &&  // asset read is in reading state.
-          ((CMTimeCompare(videoTimestamp, currentTime) == -1) ||    // timestamp is less then currentTime.
-          (CMTimeCompare(videoTimestamp, currentTime) == 0)))       // timestamp is equal currentTime.
+    BOOL bCopiedNewSamples = NO;
+    while(self.assetReaderVideoTrackOutput != nil &&                    // asset has a video track.
+          self.assetReader.status == AVAssetReaderStatusReading &&      // asset read is in reading state.
+          ((CMTimeCompare(videoTimestamp, currentTime) == -1) ||        // timestamp is less then currentTime.
+          (CMTimeCompare(videoTimestamp, currentTime) == 0)))           // timestamp is equal currentTime.
     {
-        CMSampleBufferRef bufferTemp;
+        CMSampleBufferRef videoBufferTemp;
         @try {
-            bufferTemp = [self.assetReaderVideoTrackOutput copyNextSampleBuffer];
+            videoBufferTemp = [self.assetReaderVideoTrackOutput copyNextSampleBuffer];
         } @catch (NSException * e) {
-            bOk = NO;
             break;
         }
         
-        if(bufferTemp) {
+        if(videoBufferTemp) {
             if(videoSampleBuffer) { // release old buffer.
                 CFRelease(videoSampleBuffer);
                 videoSampleBuffer = nil;
             }
-            videoSampleBuffer = bufferTemp; // save reference to new buffer.
+            videoSampleBuffer = videoBufferTemp; // save reference to new buffer.
             
             videoTimestamp = CMSampleBufferGetPresentationTimeStamp(videoSampleBuffer);
             
-        } else {
-            if(self.assetReader.status == AVAssetReaderStatusCompleted) {
-                // video finished.
-            }
-            bOk = NO;
-            break;
+            bCopiedNewSamples = YES;
         }
     }
     
-    if(bOk) {
+    if(bCopiedNewSamples == true) {
         bNewFrame = CMTimeCompare(videoTimestamp, videoTimestampLast) == 1;
         if(bNewFrame) {
             videoTimestampLast = videoTimestamp;
+            videoTime = videoTimestamp;
         }
         
         [self.delegate playerDidProgress];
@@ -660,11 +647,11 @@ static const NSString * ItemStatusContext;
 
 //---------------------------------------------------------- seek.
 - (void)seekToStart {
-	[self seekToTime:kCMTimeZero withTolerance:kCMTimePositiveInfinity];
+	[self seekToTime:kCMTimeZero withTolerance:kCMTimeZero];
 }
 
 - (void)seekToTime:(CMTime)time {
-	[self seekToTime:time withTolerance:kCMTimePositiveInfinity];
+	[self seekToTime:time withTolerance:kCMTimeZero];
 }
 
 - (void)seekToTime:(CMTime)time 
@@ -683,9 +670,16 @@ static const NSString * ItemStatusContext;
     self.assetReaderVideoTrackOutput = nil;
     self.assetReaderAudioTrackOutput = nil;
     
-    seekTime = time;
-    seekCurrentTime = currentTime;
-	[_player seekToTime:seekTime toleranceBefore:tolerance toleranceAfter:tolerance];
+    bSeeking = YES;
+    
+    [_player seekToTime:time
+        toleranceBefore:tolerance
+         toleranceAfter:tolerance
+      completionHandler:^(BOOL finished) {
+          
+          bSeeking = NO;
+          
+      }];
 }
 
 //---------------------------------------------------------- states.
@@ -732,6 +726,14 @@ static const NSString * ItemStatusContext;
 
 - (void)setSampleTime:(CMTime)time {
     sampleTime = time;
+}
+
+- (CMTime)getVideoTime {
+    return videoTime;
+}
+
+- (double)getVideoTimeInSec {
+    return CMTimeGetSeconds(videoTime);
 }
 
 - (CMTime)getCurrentTime {

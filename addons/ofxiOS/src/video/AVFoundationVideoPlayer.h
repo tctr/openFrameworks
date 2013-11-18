@@ -75,6 +75,8 @@
 - (NSInteger)getHeight;
 - (void)setSampleTimeInSec:(double)time;
 - (void)setSampleTime:(CMTime)time;
+- (CMTime)getVideoTime;
+- (double)getVideoTimeInSec;
 - (CMTime)getCurrentTime;
 - (double)getCurrentTimeInSec;
 - (CMTime)getDuration;
