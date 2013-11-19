@@ -27,6 +27,8 @@ public:
     unsigned char * getPixels();
     ofPixelsRef	getPixelsRef();
     ofTexture *	getTexture();
+    void initTextureCache();
+    void killTextureCache();
 	
     float getWidth();
     float getHeight();
