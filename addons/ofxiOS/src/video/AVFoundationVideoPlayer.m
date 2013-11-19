@@ -428,7 +428,9 @@ static const NSString * ItemStatusContext;
             bReady = true;
             [self update]; // update as soon is ready so pixels are loaded.
             [self setVolume:volume]; // set volume for current video.
-            [self.delegate playerReady];
+            if([self.delegate respondsToSelector:@selector(playerReady)]) {
+                [self.delegate playerReady];
+            }
             if(bAutoPlayOnLoad || bPlayStateBeforeLoad) {
                 [self play];
             }
@@ -459,7 +461,9 @@ static const NSString * ItemStatusContext;
 - (void)playerItemDidReachEnd {
     bFinished = YES;
     bPlaying = NO;
-    [self.delegate playerDidFinishPlayingVideo];
+    if([self.delegate respondsToSelector:@selector(playerDidFinishPlayingVideo)]) {
+        [self.delegate playerDidFinishPlayingVideo];
+    }
     if(bLoop) {
         bFinished = NO;
         [self seekToStart];
@@ -590,7 +594,9 @@ static const NSString * ItemStatusContext;
             videoTime = videoTimestamp;
         }
         
-        [self.delegate playerDidProgress];
+        if([self.delegate respondsToSelector:@selector(playerDidProgress)]) {
+            [self.delegate playerDidProgress];
+        }
     }
 }
 
@@ -687,6 +693,10 @@ static const NSString * ItemStatusContext;
       completionHandler:^(BOOL finished) {
           
           bSeeking = NO;
+          
+          if([self.delegate respondsToSelector:@selector(playerDidFinishSeeking)]) {
+              [self.delegate playerDidFinishSeeking];
+          }
           
       }];
 }

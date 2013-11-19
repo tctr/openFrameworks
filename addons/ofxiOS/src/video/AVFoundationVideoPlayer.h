@@ -25,8 +25,10 @@
 
 //---------------------------------------------------------- video player delegate.
 @protocol AVFoundationVideoPlayerDelegate <NSObject>
+@optional
 - (void)playerReady;
 - (void)playerDidProgress;
+- (void)playerDidFinishSeeking;
 - (void)playerDidFinishPlayingVideo;
 @end
 
