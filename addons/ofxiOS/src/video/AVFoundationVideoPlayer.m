@@ -529,23 +529,30 @@ static const NSString * ItemStatusContext;
     }
 
     //---------------------------------------------------------- audio buffer.
-//    while(self.assetReader.status == AVAssetReaderStatusReading &&  // asset read is in reading state.
-//          ((CMTimeCompare(audioTimestamp, currentTime) == -1) ||    // timestamp is less then currentTime.
-//           (CMTimeCompare(audioTimestamp, currentTime) == 0)))      // timestamp is equal currentTime.
-//    {
-//        CMSampleBufferRef bufferTemp = [self.assetReaderAudioTrackOutput copyNextSampleBuffer];
-//        if(bufferTemp) {
-//            if(audioSampleBuffer) { // release old buffer.
-//                CFRelease(audioSampleBuffer);
-//                audioSampleBuffer = nil;
-//            }
-//            audioSampleBuffer = bufferTemp; // save reference to new buffer.
-//            
-//            audioTimestamp = CMSampleBufferGetPresentationTimeStamp(audioSampleBuffer);
-//        } else {
-//            break;
-//        }
-//    }
+    while(self.assetReaderAudioTrackOutput != nil &&                // asset has a audio track.
+          self.assetReader.status == AVAssetReaderStatusReading &&  // asset read is in reading state.
+          ((CMTimeCompare(audioTimestamp, currentTime) == -1) ||    // timestamp is less then currentTime.
+           (CMTimeCompare(audioTimestamp, currentTime) == 0)))      // timestamp is equal currentTime.
+    {
+        CMSampleBufferRef audioBufferTemp;
+        @try {
+            audioBufferTemp = [self.assetReaderAudioTrackOutput copyNextSampleBuffer];
+        } @catch (NSException * e) {
+            break;
+        }
+        
+        if(audioBufferTemp) {
+            if(audioSampleBuffer) { // release old buffer.
+                CFRelease(audioSampleBuffer);
+                audioSampleBuffer = nil;
+            }
+            audioSampleBuffer = audioBufferTemp; // save reference to new buffer.
+            
+            audioTimestamp = CMSampleBufferGetPresentationTimeStamp(audioSampleBuffer);
+        } else {
+            break;
+        }
+    }
     
     //---------------------------------------------------------- video buffer.
     BOOL bCopiedNewSamples = NO;
@@ -571,6 +578,8 @@ static const NSString * ItemStatusContext;
             videoTimestamp = CMSampleBufferGetPresentationTimeStamp(videoSampleBuffer);
             
             bCopiedNewSamples = YES;
+        } else {
+            break;
         }
     }
     
