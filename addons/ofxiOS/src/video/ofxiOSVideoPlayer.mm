@@ -51,11 +51,21 @@ bool ofxiOSVideoPlayer::loadMovie(string name) {
 #ifdef __IPHONE_5_0
     if(bTextureCacheSupported) {
         if(_videoTextureCache == NULL) {
-            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, 
-                                                        NULL, 
+            
+            
+#ifdef __IPHONE_6_0
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault,
+                                                        NULL,
                                                         ofxiOSGetGLView().context,
-                                                        NULL, 
+                                                        NULL,
                                                         &_videoTextureCache);
+#else
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault,
+                                                        NULL,
+                                                        (__bridge void *)ofxiOSGetGLView().context,
+                                                        NULL,
+                                                        &_videoTextureCache);
+#endif
             if(err) {
                 NSLog(@"Error at CVOpenGLESTextureCacheCreate %d", err);
             }    
@@ -434,7 +444,11 @@ void ofxiOSVideoPlayer::initTextureCache() {
     
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
     
-    killTextureCache();
+    CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
+    if(_videoTextureRef) {
+        CFRelease(_videoTextureRef);
+        _videoTextureRef = NULL;
+    }
     
 #endif
 }
@@ -443,14 +457,13 @@ void ofxiOSVideoPlayer::killTextureCache() {
 #ifdef __IPHONE_5_0
     
     if(_videoTextureRef) {
-        CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
         CFRelease(_videoTextureRef);
         _videoTextureRef = NULL;
     }
-    
-    if(_videoTextureRef) {
-        CFRelease(_videoTextureRef);
-        _videoTextureRef = NULL;
+
+    if(_videoTextureCache) {
+        CFRelease(_videoTextureCache);
+        _videoTextureCache = NULL;
     }
     
 #endif
