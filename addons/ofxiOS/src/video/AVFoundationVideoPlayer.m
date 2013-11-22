@@ -494,12 +494,9 @@ static const NSString * ItemStatusContext;
     CMTime time = kCMTimeZero;
     if(CMTIME_IS_VALID(sampleTime)) {
         time = sampleTime;
+        time = CMTimeMaximum(time, kCMTimeZero);
+        time = CMTimeMinimum(time, duration);
         sampleTime = kCMTimeInvalid;
-        if(CMTIME_COMPARE_INLINE(time, <, kCMTimeZero)) {
-            time = kCMTimeZero;
-        } else if(CMTIME_COMPARE_INLINE(time, >, duration)) {
-            time = duration;
-        }
     } else {
         time = [_player currentTime];
     }
@@ -703,6 +700,9 @@ static const NSString * ItemStatusContext;
     self.assetReaderAudioTrackOutput = nil;
     
     bSeeking = YES;
+    
+    time = CMTimeMaximum(time, kCMTimeZero);
+    time = CMTimeMinimum(time, duration);
     
     [_player seekToTime:time
         toleranceBefore:tolerance
