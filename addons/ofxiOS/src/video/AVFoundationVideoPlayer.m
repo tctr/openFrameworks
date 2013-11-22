@@ -504,23 +504,40 @@ static const NSString * ItemStatusContext;
         time = [_player currentTime];
     }
     
-    if(bUpdateFirstFrame) {
-        /**
-         *  this forces the first frame to be updated.
-         *  here the values for time and currentTime are both zero.
-         *  so this is to get around the progress check below.
-         */
-        bUpdateFirstFrame = NO;
-    } else if(CMTimeCompare(time, currentTime) == 0) {
-        bNewFrame = NO;
-        return; // no progress made.
-    }
+    BOOL bTimeChanged = CMTimeCompare(time, currentTime) != 0;
     currentTime = time;
+    
+    if(bUpdateFirstFrame) {
+
+        // this forces the first frame to be updated.
+        // here the values for time and currentTime are both zero.
+        // so this is to get around the progress check below.
+        
+        bUpdateFirstFrame = NO;
+        
+    } else if(bTimeChanged == NO) {
+        
+        // current time has not changed,
+        // so the video has not progressed.
+        
+        if(self.assetReader != nil) {
+            
+            // check that assetReader has been created.
+            // if assetReader is nil, the video must still be seeking to a new position.
+            // so even though the time has not changed, the assetReader needs to created.
+            
+            bNewFrame = NO;
+            return;
+        }
+    }
     
     if(self.assetReader == nil) {
         if(bSeeking == true) {
+            
             // video player is seeking to new position.
             // asset reader can only be created when seeking has finished.
+            
+            bNewFrame = NO;
             return;
         }
         
