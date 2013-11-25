@@ -23,12 +23,24 @@ ofxiOSVideoPlayer::ofxiOSVideoPlayer() {
     bTextureCacheSupported = false;
 #ifdef __IPHONE_5_0    
     bTextureCacheSupported = (CVOpenGLESTextureCacheCreate != NULL);
-#endif    
+#endif   
+    bTextureCacheEnabled = true;
 }
 
 //----------------------------------------
 ofxiOSVideoPlayer::~ofxiOSVideoPlayer() {
 	close();
+}
+
+//----------------------------------------
+void ofxiOSVideoPlayer::enableTextureCache() {
+    bTextureCacheEnabled = true;
+}
+
+void ofxiOSVideoPlayer::disableTextureCache() {
+    bTextureCacheEnabled = false;
+    bResetTexture = true;
+    killTextureCache();
 }
 
 //----------------------------------------
@@ -49,7 +61,7 @@ bool ofxiOSVideoPlayer::loadMovie(string name) {
     bUpdateTexture = true;
     
 #ifdef __IPHONE_5_0
-    if(bTextureCacheSupported) {
+    if(bTextureCacheSupported == true && bTextureCacheEnabled == true) {
         if(_videoTextureCache == NULL) {
             
             
@@ -188,111 +200,117 @@ bool ofxiOSVideoPlayer::isFrameNew() {
 //----------------------------------------
 unsigned char * ofxiOSVideoPlayer::getPixels() {
     
-	if(isLoaded())
-	{
-        if(!bUpdatePixels) { // if pixels have not changed, return the already calculated pixels.
-            if(internalGLFormat == GL_RGB) {
-                updatePixelsToRGB();
-                return pixelsRGB;
-            }  else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
-                return pixelsRGBA;
-            }
-        }
-        
-		CGImageRef currentFrameRef;
-		
-		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-		
-		CVImageBufferRef imageBuffer = [(AVFoundationVideoPlayer *)videoPlayer getCurrentFrame]; 
-        
-		/*Lock the image buffer*/
-		CVPixelBufferLockBaseAddress(imageBuffer,0);
-		
-		/*Get information about the image*/
-		uint8_t *baseAddress	= (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer); 
-		size_t bytesPerRow		= CVPixelBufferGetBytesPerRow(imageBuffer); 
-		size_t width			= CVPixelBufferGetWidth(imageBuffer); 
-		size_t height			= CVPixelBufferGetHeight(imageBuffer);  
-		
-		/*Create a CGImageRef from the CVImageBufferRef*/
-		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
-		CGContextRef newContext = CGBitmapContextCreate(baseAddress, 
-                                                        width, 
-                                                        height, 
-                                                        8, 
-                                                        bytesPerRow, 
-                                                        colorSpace, 
-                                                        kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-		CGImageRef newImage	= CGBitmapContextCreateImage(newContext); 
-		
-		currentFrameRef = CGImageCreateCopy(newImage);		
-		
-		/*We release some components*/
-		CGContextRelease(newContext); 
-		CGColorSpaceRelease(colorSpace);
-		
-		/*We relase the CGImageRef*/
-		CGImageRelease(newImage);
-		
-		/*We unlock the  image buffer*/
-		CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-		
-		if(bResetPixels) {
-            
-            if(pixelsRGBA != NULL) {
-                free(pixelsRGBA);
-                pixelsRGBA = NULL;
-            }
-            
-            if(pixelsRGB != NULL) {
-                free(pixelsRGB);
-                pixelsRGB = NULL;
-            }
-
-            pixelsRGBA = (GLubyte *) malloc(width * height * 4);
-            pixelsRGB  = (GLubyte *) malloc(width * height * 3);
-            
-            bResetPixels = false;
-		}
-		
-		[pool drain];
-		
-        CGContextRef spriteContext;
-        spriteContext = CGBitmapContextCreate(pixelsRGBA, 
-                                              width, 
-                                              height, 
-                                              CGImageGetBitsPerComponent(currentFrameRef), 
-                                              width * 4, 
-                                              CGImageGetColorSpace(currentFrameRef), 
-                                              kCGImageAlphaPremultipliedLast);
-        
-        CGContextDrawImage(spriteContext, 
-                           CGRectMake(0.0, 0.0, (CGFloat)width, (CGFloat)height), 
-                           currentFrameRef);
-        
-        CGContextRelease(spriteContext);
-        
-        if(internalGLFormat == GL_RGB) {
-            updatePixelsToRGB();
-        } else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
-            // pixels are already 4 channel. 
-            // return pixelsRaw instead of pixels (further down).
-        }
-        
-        CGImageRelease(currentFrameRef);
-		
-        bUpdatePixels = false;
-        
-        if(internalGLFormat == GL_RGB) {
-            return pixelsRGB;
-        }  else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
-            return pixelsRGBA;
-        }
-        
+	if(isLoaded() == false) {
         return NULL;
 	}
 	
-	return NULL;
+    if(bUpdatePixels == false) {
+        
+        // if pixels have not changed,
+        // return the already calculated pixels.
+        
+        if(internalGLFormat == GL_RGB) {
+            
+            updatePixelsToRGB();
+            return pixelsRGB;
+            
+        } else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
+            
+            return pixelsRGBA;
+        }
+    }
+    
+    CGImageRef currentFrameRef;
+    
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
+    CVImageBufferRef imageBuffer = [(AVFoundationVideoPlayer *)videoPlayer getCurrentFrame];
+    
+    /*Lock the image buffer*/
+    CVPixelBufferLockBaseAddress(imageBuffer,0);
+    
+    /*Get information about the image*/
+    uint8_t *baseAddress	= (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
+    size_t bytesPerRow		= CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width			= CVPixelBufferGetWidth(imageBuffer);
+    size_t height			= CVPixelBufferGetHeight(imageBuffer);
+    
+    /*Create a CGImageRef from the CVImageBufferRef*/
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef newContext = CGBitmapContextCreate(baseAddress,
+                                                    width,
+                                                    height,
+                                                    8,
+                                                    bytesPerRow,
+                                                    colorSpace,
+                                                    kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGImageRef newImage	= CGBitmapContextCreateImage(newContext);
+    
+    currentFrameRef = CGImageCreateCopy(newImage);
+    
+    /*We release some components*/
+    CGContextRelease(newContext);
+    CGColorSpaceRelease(colorSpace);
+    
+    /*We relase the CGImageRef*/
+    CGImageRelease(newImage);
+    
+    /*We unlock the  image buffer*/
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    
+    if(bResetPixels) {
+        
+        if(pixelsRGBA != NULL) {
+            free(pixelsRGBA);
+            pixelsRGBA = NULL;
+        }
+        
+        if(pixelsRGB != NULL) {
+            free(pixelsRGB);
+            pixelsRGB = NULL;
+        }
+        
+        pixelsRGBA = (GLubyte *) malloc(width * height * 4);
+        pixelsRGB  = (GLubyte *) malloc(width * height * 3);
+        
+        bResetPixels = false;
+    }
+    
+    [pool drain];
+    
+    CGContextRef spriteContext;
+    spriteContext = CGBitmapContextCreate(pixelsRGBA,
+                                          width,
+                                          height,
+                                          CGImageGetBitsPerComponent(currentFrameRef),
+                                          width * 4,
+                                          CGImageGetColorSpace(currentFrameRef),
+                                          kCGImageAlphaPremultipliedLast);
+    
+    CGContextDrawImage(spriteContext,
+                       CGRectMake(0.0, 0.0, (CGFloat)width, (CGFloat)height),
+                       currentFrameRef);
+    
+    CGContextRelease(spriteContext);
+    
+    if(internalGLFormat == GL_RGB) {
+        updatePixelsToRGB();
+    } else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
+        // pixels are already 4 channel.
+        // return pixelsRaw instead of pixels (further down).
+    }
+    
+    CGImageRelease(currentFrameRef);
+    
+    bUpdatePixels = false;
+    
+    if(internalGLFormat == GL_RGB) {
+        return pixelsRGB;
+    }  else if(internalGLFormat == GL_RGBA || internalGLFormat == GL_BGRA) {
+        return pixelsRGBA;
+    }
+    
+    return NULL;
 }
 
 void ofxiOSVideoPlayer::updatePixelsToRGB () {
@@ -331,7 +349,7 @@ ofTexture * ofxiOSVideoPlayer::getTexture() {
         return &videoTexture;
     }
 
-    if(bTextureCacheSupported == true) {
+    if(bTextureCacheSupported == true && bTextureCacheEnabled == true) {
         
         initTextureCache();
         
