@@ -74,6 +74,8 @@ NSString * const kCurrentItemKey	= @"currentItem";
     BOOL bAutoPlayOnLoad;
     BOOL bLoop;
     BOOL bSeeking;
+    BOOL bSampleVideo;
+    BOOL bSampleAudio;
 }
 
 @synthesize delegate;
@@ -134,6 +136,8 @@ static const NSString * ItemStatusContext;
         bAutoPlayOnLoad = NO;
         bLoop = NO;
         bSeeking = NO;
+        bSampleVideo = YES;
+        bSampleAudio = YES;
     }
     return self;
 }
@@ -547,7 +551,8 @@ static const NSString * ItemStatusContext;
     }
 
     //---------------------------------------------------------- audio buffer.
-    while(self.assetReaderAudioTrackOutput != nil &&                // asset has a audio track.
+    while(bSampleAudio == true &&                                   // audio sampling is on.
+          self.assetReaderAudioTrackOutput != nil &&                // asset has a audio track.
           self.assetReader.status == AVAssetReaderStatusReading &&  // asset read is in reading state.
           ((CMTimeCompare(audioTimestamp, currentTime) == -1) ||    // timestamp is less then currentTime.
            (CMTimeCompare(audioTimestamp, currentTime) == 0)))      // timestamp is equal currentTime.
@@ -574,7 +579,8 @@ static const NSString * ItemStatusContext;
     
     //---------------------------------------------------------- video buffer.
     BOOL bCopiedNewSamples = NO;
-    while(self.assetReaderVideoTrackOutput != nil &&                    // asset has a video track.
+    while(bSampleVideo == true &&                                       // video sampling is on.
+          self.assetReaderVideoTrackOutput != nil &&                    // asset has a video track.
           self.assetReader.status == AVAssetReaderStatusReading &&      // asset read is in reading state.
           ((CMTimeCompare(videoTimestamp, currentTime) == -1) ||        // timestamp is less then currentTime.
           (CMTimeCompare(videoTimestamp, currentTime) == 0)))           // timestamp is equal currentTime.
@@ -762,6 +768,14 @@ static const NSString * ItemStatusContext;
 
 - (void)setSampleTime:(CMTime)time {
     sampleTime = time;
+}
+
+- (void)setSampleVideo:(BOOL)value {
+    bSampleVideo = value;
+}
+
+- (void)setSampleAudio:(BOOL)value {
+    bSampleAudio = value;
 }
 
 - (CMTime)getVideoTime {
