@@ -689,24 +689,31 @@ public class OFAndroid {
     
     private static int orientation=-1;
     public static void setScreenOrientation(int orientation){
-    	OFAndroid.orientation = orientation;
+        int requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     	switch(orientation){
-    	case 0:
-    		ofActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    		break;
-    	case 90:
-    		ofActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    		break;
-    	case 270:
-    		ofActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-    		break;
-    	case 180:
-    		ofActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-    		break;
-    	case -1:
-    		ofActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-    		break;
+            case 0:
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                break;
+            case 90:
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                break;
+            case 270:
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+                break;
+            case 180:
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+                break;
     	}
+        
+        if(ofActivity.getRequestedOrientation() == requestedOrientation) {
+            return;
+        }
+        
+    	OFAndroid.orientation = orientation;
+        
+        ofActivity.setRequestedOrientation(requestedOrientation);
+        
+        Log.i("setScreenOrientation", String.valueOf(orientation));
     }
     
     public static void pauseApp(){
