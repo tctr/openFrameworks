@@ -49,13 +49,6 @@
 #include <sys/sysctl.h>
 
 
-enum ofxiOSDeviceType {
-    OFXIOS_DEVICE_IPHONE = 0,
-    OFXIOS_DEVICE_IPODTOUCH,
-    OFXIOS_DEVICE_IPAD,
-    OFXIOS_DEVICE_UNKNOWN
-};
-
 // this is the new way for getting device info.
 // we can add other parameters later.
 // maybe also methods for checking if device is newer or older than a certain model.
