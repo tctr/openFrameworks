@@ -65,6 +65,7 @@
 		671C0AF71770246200DF03B3 /* ofxiOSSoundPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 671C0AF31770246200DF03B3 /* ofxiOSSoundPlayer.mm */; };
 		67509ABC17979781003A3A29 /* ofXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67509ABA17979781003A3A29 /* ofXml.cpp */; };
 		67509ABD17979781003A3A29 /* ofXml.h in Headers */ = {isa = PBXBuildFile; fileRef = 67509ABB17979781003A3A29 /* ofXml.h */; };
+		677F67B31A011DF10068044A /* ofxiOSConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 677F67B21A011DF10068044A /* ofxiOSConstants.h */; };
 		678C3D23176F04F800D1CC68 /* ofxiOSSoundStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 678C3D19176F04F800D1CC68 /* ofxiOSSoundStream.h */; };
 		678C3D24176F04F800D1CC68 /* ofxiOSSoundStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 678C3D1A176F04F800D1CC68 /* ofxiOSSoundStream.mm */; };
 		678C3D25176F04F800D1CC68 /* ofxiOSSoundStreamDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 678C3D1B176F04F800D1CC68 /* ofxiOSSoundStreamDelegate.h */; };
@@ -268,6 +269,7 @@
 		671C0AF31770246200DF03B3 /* ofxiOSSoundPlayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxiOSSoundPlayer.mm; sourceTree = "<group>"; };
 		67509ABA17979781003A3A29 /* ofXml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofXml.cpp; sourceTree = "<group>"; };
 		67509ABB17979781003A3A29 /* ofXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofXml.h; sourceTree = "<group>"; };
+		677F67B21A011DF10068044A /* ofxiOSConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxiOSConstants.h; sourceTree = "<group>"; };
 		678C3D19176F04F800D1CC68 /* ofxiOSSoundStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxiOSSoundStream.h; sourceTree = "<group>"; };
 		678C3D1A176F04F800D1CC68 /* ofxiOSSoundStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxiOSSoundStream.mm; sourceTree = "<group>"; };
 		678C3D1B176F04F800D1CC68 /* ofxiOSSoundStreamDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxiOSSoundStreamDelegate.h; sourceTree = "<group>"; };
@@ -637,6 +639,7 @@
 			children = (
 				860B024C17A96D840032B827 /* ofxiOS.h */,
 				15BC775215A5C31F00772525 /* ofxiOSExtensions.h */,
+				677F67B21A011DF10068044A /* ofxiOSConstants.h */,
 				15594EFE15C55A5700727FF2 /* app */,
 				15594F8A15C56A4E00727FF2 /* core */,
 				15594F0015C55A5700727FF2 /* gl */,
@@ -977,6 +980,7 @@
 				15594FC815C56D1E00727FF2 /* ofxiOSImagePicker.h in Headers */,
 				15594FC915C56D1E00727FF2 /* ofxiOSKeyboard.h in Headers */,
 				15594FCA15C56D1E00727FF2 /* ofxiOSMapKit.h in Headers */,
+				677F67B31A011DF10068044A /* ofxiOSConstants.h in Headers */,
 				15594FCB15C56D1E00727FF2 /* ofxiOSMapKitDelegate.h in Headers */,
 				15594FCC15C56D1E00727FF2 /* ofxiOSMapKitListener.h in Headers */,
 				1594366615CF5F420087B684 /* ofxiOSVideoGrabber.h in Headers */,
