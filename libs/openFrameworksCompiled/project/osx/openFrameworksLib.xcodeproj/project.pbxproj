@@ -909,6 +909,7 @@
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/debug/";
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = "";
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -921,6 +922,7 @@
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/release";
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = "";
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
