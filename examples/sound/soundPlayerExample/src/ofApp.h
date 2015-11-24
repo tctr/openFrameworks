@@ -20,6 +20,8 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+	
+	void audioOut(ofSoundBuffer &outBuffer);
 		
 		ofSoundPlayer  beats;
 		ofSoundPlayer  synth;
@@ -27,6 +29,16 @@ class ofApp : public ofBaseApp{
 
 		ofTrueTypeFont	font;
 		float 			synthPosition;
-		
+	
+	
+	double wavePhase;
+	double pulsePhase;
+	double sampleRate;
+	
+	mutex audioMutex;
+	ofSoundBuffer lastBuffer;
+	ofPolyline waveform;
+	float rms;
+	
 };
 
