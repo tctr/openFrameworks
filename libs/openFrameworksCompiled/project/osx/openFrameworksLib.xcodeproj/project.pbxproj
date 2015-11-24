@@ -866,7 +866,7 @@
 				);
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/debug/";
 				PRODUCT_NAME = openFrameworksDebug;
-				SDKROOT = "";
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -895,7 +895,7 @@
 				);
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/release/";
 				PRODUCT_NAME = openFrameworks;
-				SDKROOT = "";
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -906,6 +906,7 @@
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/../../lib/osx/";
 				CONFIGURATION_TEMP_DIR = "$(SRCROOT)/../../lib/osx/build/debug/";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/debug/";
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = "";
@@ -919,6 +920,7 @@
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/../../lib/osx/";
 				CONFIGURATION_TEMP_DIR = "$(SRCROOT)/../../lib/osx/build/release/";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OBJROOT = "$(SRCROOT)/../../lib/osx/build/release";
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = "";
