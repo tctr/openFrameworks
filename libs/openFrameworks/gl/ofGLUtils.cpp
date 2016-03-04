@@ -98,11 +98,11 @@ int ofGetGlInternalFormat(const ofFloatPixels& pix) {
 string ofGetGlInternalFormatName(int glInternalFormat) {
 	switch(glInternalFormat) {
 		case GL_RGBA: return "GL_RGBA";
-#ifndef TARGET_OPENGLES
+#if !defined(TARGET_OPENGLES) || defined(TARGET_OPENGLES_3_0)
 		case GL_RGBA8: return "GL_RGBA8";
 #endif
 		case GL_RGB: return "GL_RGB";
-#ifndef TARGET_OPENGLES
+#if !defined(TARGET_OPENGLES) || defined(TARGET_OPENGLES_3_0)
 		case GL_RGB8: return "GL_RGB8";
 #endif
 		case GL_LUMINANCE: return "GL_LUMINANCE";
