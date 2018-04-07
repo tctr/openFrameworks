@@ -22,14 +22,18 @@ createRaspbianImg(){
     multistrap -a armhf -d raspbian -f multistrap.conf
 }
 
+SCRIPT_DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$SCRIPT_DIR" ]]; then SCRIPT_DIR="$PWD"; fi
+. "$SCRIPT_DIR/../../dev/downloader.sh"
+
 downloadToolchain(){
-    wget http://ci.openframeworks.cc/rpi_toolchain.tar.bz2
+    downloader http://ci.openframeworks.cc/rpi_toolchain.tar.bz2
     tar xjf rpi_toolchain.tar.bz2
     rm rpi_toolchain.tar.bz2
 }
 
 downloadFirmware(){
-    wget https://github.com/raspberrypi/firmware/archive/master.zip -O firmware.zip
+    downloader https://github.com/raspberrypi/firmware/archive/master.zip -O firmware.zip
     unzip firmware.zip
     cp -r firmware-master/opt raspbian/
     rm -r firmware-master
