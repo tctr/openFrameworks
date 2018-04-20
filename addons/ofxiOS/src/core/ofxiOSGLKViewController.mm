@@ -458,6 +458,12 @@
     }
 }
 
+- (void)setMSAA:(bool)value {
+    if(self.glView != nil) {
+        [self.glView setMSAA:value];
+    }
+}
+
 @end
 
 #endif

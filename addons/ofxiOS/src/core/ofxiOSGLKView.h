@@ -36,7 +36,7 @@ class ofAppiOSWindow;
 - (void)setup;
 - (void)update;
 - (void)draw;
-
+- (void)setMSAA:(bool)on;
 - (void)updateDimensions;
 - (void)destroy;
 - (CGPoint)orientateTouchPoint:(CGPoint)touchPoint;
