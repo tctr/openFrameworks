@@ -15,9 +15,9 @@ enum ofxiOSDeviceType {
     OFXIOS_DEVICE_IPODTOUCH,
     OFXIOS_DEVICE_IPAD,
     OFXIOS_DEVICE_APPLETV,
+    OFXIOS_DEVICE_WATCH,
     OFXIOS_DEVICE_UNKNOWN
 };
-
 
 // iOS Renderer Types.
 //-------------------------------------------------------------------------------
@@ -50,6 +50,7 @@ enum ofxiOSRendererStencilFormat{
     STENCIL_NONE = 0,
     STENCIL_8,
 };
+
 
 // Orientation.
 //-------------------------------------------------------------------------------

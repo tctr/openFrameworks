@@ -47,6 +47,8 @@
 #include "ofxiOSViewController.h"
 #include "ofxiOSGLKViewController.h"
 #include "ofxiOSGLKView.h"
+#include "ofxiOSMTKViewController.h"
+#include "ofxiOSMTKView.h"
 #include "ofxiOSEAGLView.h"
 #include "ofxiOSApp.h"
 #include "ofxiOSExtras.h"

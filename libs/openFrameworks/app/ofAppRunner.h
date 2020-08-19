@@ -8,7 +8,9 @@
 class ofAppBaseWindow;
 class ofAppBaseGLWindow;
 class ofAppBaseGLESWindow;
+class ofAppBaseMetalWindow;
 class ofAppGLFWWindow;
+class ofAppMetalWindow;
 class ofBaseApp;
 class ofBaseRenderer;
 class ofCoreEvents;

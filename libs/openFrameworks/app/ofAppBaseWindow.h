@@ -130,3 +130,18 @@ public:
 		}
 	}
 };
+
+class ofAppBaseMetalWindow: public ofAppBaseWindow{
+public:
+    virtual ~ofAppBaseMetalWindow(){}
+    virtual void setup(const ofMetalWindowSettings & settings)=0;
+    void setup(const ofWindowSettings & settings){
+        const ofMetalWindowSettings * metalSettings = dynamic_cast<const ofMetalWindowSettings*>(&settings);
+        if(metalSettings){
+            setup(*metalSettings);
+        }else{
+            setup(ofMetalWindowSettings(settings));
+        }
+    }
+};
+

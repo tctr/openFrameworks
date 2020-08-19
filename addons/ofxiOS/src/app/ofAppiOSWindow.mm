@@ -41,6 +41,7 @@
     #include "ofxtvOSViewController.h"
     const std::string appDelegateName = "ofxtvOSAppDelegate";
 #endif
+#include "ofxiOSMTKView.h"
 #include "ofxiOSGLKView.h"
 #include "ofxiOSEAGLView.h"
 
@@ -166,21 +167,27 @@ void ofAppiOSWindow::setWindowShape(int w, int h) {
 }
 
 glm::vec2	ofAppiOSWindow::getWindowPosition() {
-	if(settings.windowControllerType == METAL_KIT || settings.windowControllerType == GL_KIT)
+	if(settings.windowControllerType == METAL_KIT)
+        return *[[ofxiOSMTKView getInstance] getWindowPosition];
+    else if(settings.windowControllerType == GL_KIT)
 		return *[[ofxiOSGLKView getInstance] getWindowPosition];
 	else
 		return *[[ofxiOSEAGLView getInstance] getWindowPosition];
 }
 
 glm::vec2	ofAppiOSWindow::getWindowSize() {
-	if(settings.windowControllerType == METAL_KIT || settings.windowControllerType == GL_KIT)
-		return *[[ofxiOSGLKView getInstance] getWindowSize];
+	if(settings.windowControllerType == METAL_KIT)
+        return *[[ofxiOSMTKView getInstance] getWindowSize];
+    else if(settings.windowControllerType == GL_KIT)
+        return *[[ofxiOSGLKView getInstance] getWindowSize];
 	else
 		return *[[ofxiOSEAGLView getInstance] getWindowSize];
 }
 
 glm::vec2	ofAppiOSWindow::getScreenSize() {
-	if(settings.windowControllerType == METAL_KIT || settings.windowControllerType == GL_KIT)
+	if(settings.windowControllerType == METAL_KIT)
+        return *[[ofxiOSMTKView getInstance] getWindowSize];
+    else if(settings.windowControllerType == GL_KIT)
 		return *[[ofxiOSGLKView getInstance] getScreenSize];
 	else
 		return *[[ofxiOSEAGLView getInstance] getScreenSize];
@@ -430,7 +437,12 @@ bool ofAppiOSWindow::enableAntiAliasing(int samples) {
 void ofAppiOSWindow::enableMultiTouch(bool isOn) {
 	settings.enableMultiTouch = isOn;
 #if TARGET_OS_IOS || (TARGET_OS_IPHONE && !TARGET_OS_TV)
-	if(settings.windowControllerType == METAL_KIT || settings.windowControllerType == GL_KIT) {
+    if(settings.windowControllerType == METAL_KIT) {
+        if([ofxiOSMTKView getInstance]) {
+            [[ofxiOSMTKView getInstance] setMultipleTouchEnabled:isOn];
+        }
+    }
+    else if(settings.windowControllerType == GL_KIT) {
 		if([ofxiOSGLKView getInstance]) {
 			[[ofxiOSGLKView getInstance] setMultipleTouchEnabled:isOn];
 		}

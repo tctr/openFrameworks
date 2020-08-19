@@ -4,11 +4,11 @@
 #include <vector>
 #include "ofGraphicsBaseTypes.h"
 #include "ofCoreBaseTypes.h"
-
 class ofTexture;
 class ofShader;
+class of3dPrimitive;
 
-class ofBaseGLRenderer: public ofBaseRenderer{
+class ofBaseMetalRenderer: public ofBaseRenderer{
 public:
 	using ofBaseRenderer::draw;
 
@@ -81,61 +81,7 @@ public:
 	/// \sa https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
 	virtual void drawElements(const ofVbo & vbo, GLuint drawMode, int amt, int offsetelements) const=0;
 
-	/// \brief Draw vertices from a vertext buffer using instanced arrays.
-	///
-	/// \p drawMode may be any of the OpenGL primitive draw modes:
-	///    GL_POINTS,
-	///    GL_LINE_STRIP,
-	///    GL_LINE_LOOP,
-	///    GL_LINES,
-	///    GL_TRIANGLE_STRIP,
-	///    GL_TRIANGLE_FAN,
-	///    GL_TRIANGLES
-	///
-	/// ofGetGLPrimitiveMode() can also be used to get the GLuint draw mode
-	/// from an ofPrimitiveMode.
-	///
-	/// \param vbo The vertext buffer object to draw vertices from with this
-	///        renderer.
-	/// \param drawMode OpenGL primitive draw mode to use when drawing the vbo's
-	///        vertices with this renderer.
-	/// \param first The index of the first vertex to draw from \p vbo.
-	/// \param total The total number of indices to draw from \p vbo.
-	/// \param primCount Specifies the number of instances of the specified
-	///        range of indices to be rendered.
-	/// \warning This method may be unsupported when using OpenGLES.
-	/// \sa ofGetGLPrimitiveMode()
-	/// \sa glDrawArraysInstanced()
-	/// \sa https://www.khronos.org/opengles/sdk/docs/man3/html/glDrawArraysInstanced.xhtml
-	virtual void drawInstanced(const ofVbo & vbo, GLuint drawMode, int first, int total, int primCount) const=0;
-
-	/// \brief Draw vertices from a vertex buffer using this renderer.
-	///
-	/// \p drawMode may be any of the OpenGL primitive draw modes:
-	///    GL_POINTS,
-	///    GL_LINE_STRIP,
-	///    GL_LINE_LOOP,
-	///    GL_LINES,
-	///    GL_TRIANGLE_STRIP,
-	///    GL_TRIANGLE_FAN,
-	///    GL_TRIANGLES
-	///
-	/// ofGetGLPrimitiveMode() can also be used to get the GLuint draw mode
-	/// from an ofPrimitiveMode.
-	///
-	/// \param vbo The vertext buffer object to draw vertices from with this
-	///        renderer.
-	/// \param drawMode OpenGL primitive draw mode to use when drawing the vbo's
-	///        vertices with this renderer.
-	/// \param amt The number of elements to be rendered.
-	/// \param primCount Specifies the number of instances of the specified
-	///        range of indices to be rendered.
-	/// \warning This method may be unsupported when using OpenGLES.
-	/// \sa ofGetGLPrimitiveMode()
-	/// \sa glDrawElementsInstanced()
-	/// \sa https://www.opengl.org/sdk/docs/man/html/glDrawElementsInstanced.xhtml
-	virtual void drawElementsInstanced(const ofVbo & vbo, GLuint drawMode, int amt, int primCount) const=0;
-
+	
 	/// \brief Draw a vertex buffer mesh using a specific poly render mode.
 	///
 	/// \p renderType defines how the \p mesh will be rendered and may be:
@@ -310,18 +256,7 @@ public:
 	///        the light in homogeneous object coordinates.
 	/// \sa GL_SPOT_DIRECTION
 	virtual void setLightSpotDirection(int lightIndex, const glm::vec4 & direction)=0;
-
-	/// \section GL Version
-
-	/// \brief Get the major OpenGL version number this renderer is using.
-	///
-	/// \returns The major OpenGL version number this renderer is using.
-	virtual int getGLVersionMajor()=0;
-
-	/// \brief Get the minor OpenGL version number this renderer is using.
-	///
-	/// \returns The minor OpenGL version number this renderer is using.
-	virtual int getGLVersionMinor()=0;
+	
 
 	/// \section Saving Screen Pixels
 

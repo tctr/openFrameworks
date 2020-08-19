@@ -137,3 +137,25 @@ public:
 
 	int glesVersion;
 };
+
+class ofMetalWindowSettings: public ofWindowSettings{
+public:
+    ofMetalWindowSettings()
+    :metalVersion(1){}
+
+    ofMetalWindowSettings(const ofWindowSettings & settings)
+    :ofWindowSettings(settings), metalVersion(1) {
+        const ofMetalWindowSettings * metalSettings = dynamic_cast<const ofMetalWindowSettings*>(&settings);
+        if(metalSettings){
+            metalVersion = metalSettings->metalVersion;
+        }
+    }
+
+    virtual ~ofMetalWindowSettings(){};
+
+    void setMetalVersion(int version){
+        metalVersion = version;
+    }
+
+    int metalVersion;
+};

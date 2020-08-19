@@ -45,7 +45,10 @@
         bAnimated       = NO;
         self.glView = [[[ofxiOSEAGLView alloc] initWithFrame:frame andApp:app sharegroup:sharegroup] autorelease];
         
-        [self.glView setMultipleTouchEnabled:ofxiOSGetOFWindow()->isMultiTouch()];
+        if(ofxiOSGetOFWindow() != nil)
+            [self.glView setMultipleTouchEnabled:ofxiOSGetOFWindow()->isMultiTouch()];
+        else
+            [self.glView setMultipleTouchEnabled:YES];
         self.glView.delegate = self;
     }
     
