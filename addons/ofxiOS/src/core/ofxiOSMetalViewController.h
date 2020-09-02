@@ -1,12 +1,12 @@
 //
-//  ofxiOSMTKViewController.h
+//  ofxiOSMetalViewController.h
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
 //
 
-#ifndef ofxiOSMTKViewController_h
-#define ofxiOSMTKViewController_h
+#ifndef ofxiOSMetalViewController_h
+#define ofxiOSMetalViewController_h
 
 #pragma once
 
@@ -15,17 +15,17 @@
 
 #import <UIKit/UIKit.h>
 #import <MetalKit/MetalKit.h>
+#import "ofxMetalViewController.h"
 
 class ofxiOSApp;
-@class ofxiOSMTKView;
+@class ofxiOSMetalView;
 
-@interface ofxiOSMTKViewController : UIViewController
+@interface ofxiOSMetalViewController : ofxMetalViewController
 
-@property (nonatomic, retain) ofxiOSMTKView * mtkview;
+@property (nonatomic, retain) ofxiOSMetalView * metalView;
 @property (nonatomic, retain) MTKView * view;
 
 - (id)initWithFrame:(CGRect)frame app:(ofxiOSApp *)app;
-- (id)initWithFrame:(CGRect)frame app:(ofxiOSApp *)app sharegroup:(EAGLSharegroup *)sharegroup;
 
 - (UIInterfaceOrientation)currentInterfaceOrientation;
 - (void)setCurrentInterfaceOrientation:(UIInterfaceOrientation) orient;
@@ -34,7 +34,7 @@ class ofxiOSApp;
 - (BOOL)isReadyToRotate;
 - (void)setPreferredFPS:(int)fps;
 - (void)setMSAA:(bool)value;
-- (EAGLSharegroup *)getSharegroup;
+
 
 @end
 

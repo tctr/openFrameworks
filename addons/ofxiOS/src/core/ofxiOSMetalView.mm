@@ -1,38 +1,41 @@
 //
-//  ofxiOSMTKView.mm
+//  ofxiOSMetalView.mm
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
 //
 
-#include "ofxiOSMTKView.h"
+#include "ofxiOSMetalView.h"
 #import <Metal/Metal.h>
 #include "ofxiOSApp.h"
-#include "ofAppiOSWindow.h"
-#include "ofGLRenderer.h"
-#include "ofGLProgrammableRenderer.h"
+#include "ofAppiOSMetalWindow.h"
+#include "MetalRenderer.h"
+#include "MetalRenderer.h"
+#include "ofMetalProgrammableRenderer.h"
 #include <TargetConditionals.h>
 #import <GameController/GameController.h>
 
-static ofxiOSMTKView * _instanceRef = nil;
+static ofxiOSMetalView * _instanceRef = nil;
 
-@interface ofxiOSMTKView() {
+@interface ofxiOSMetalView() {
     BOOL bInit;
-    shared_ptr<ofAppiOSWindow> window;
+    shared_ptr<ofAppiOSMetalWindow> window;
     shared_ptr<ofxiOSApp> app;
     CADisplayLink *_displayLink;
+    NSThread *_renderThread;
+    BOOL _continueRunLoop;
     BOOL bSetup;
+    
 }
-- (void)updateDimensions;
 @end
 
-@implementation ofxiOSMTKView
+@implementation ofxiOSMetalView
 
 @synthesize screenSize;
 @synthesize windowSize;
 @synthesize windowPos;
 
-+ (ofxiOSMTKView *) getInstance {
++ (ofxiOSMetalView *) getInstance {
     return _instanceRef;
 }
 
@@ -42,12 +45,8 @@ static ofxiOSMTKView * _instanceRef = nil;
 }
 
 - (id)initWithFrame:(CGRect)frame andApp:(ofxiOSApp *)appPtr {
-    return [self initWithFrame:frame andApp:appPtr sharegroup:nil];
-}
-
-- (id)initWithFrame:(CGRect)frame andApp:(ofxiOSApp *)appPtr sharegroup:(EAGLSharegroup *)sharegroup{
     
-    window = dynamic_pointer_cast<ofAppiOSWindow>(ofGetMainLoop()->getCurrentWindow());
+    window = dynamic_pointer_cast<ofAppiOSMetalWindow>(ofGetMainLoop()->getCurrentWindow());
     
     if(window.get() == NULL) {
         ofLog(OF_LOG_FATAL_ERROR, "ofxiOSEAGLView::initWithFrame - window is NULL");
@@ -93,19 +92,17 @@ static ofxiOSMTKView * _instanceRef = nil;
         auto mainLoop = std::make_shared<ofMainLoop>(); // make new main loop.
         ofSetMainLoop(mainLoop);
         
-        ofiOSWindowSettings windowSettings = window->getSettings();
+        ofiOSMetalWindowSettings windowSettings = window->getSettings();
         window = NULL;
 
-        window = dynamic_pointer_cast<ofAppiOSWindow>(ofCreateWindow(windowSettings));
+        window = dynamic_pointer_cast<ofAppiOSMetalWindow>(ofCreateWindow(windowSettings));
 
         ofRunApp(app);
     }
     
     if(window->isProgrammableRenderer() == true) {
-        static_cast<ofGLProgrammableRenderer*>(window->renderer().get())->setup(window->getSettings().glesVersion, 0);
-    } else{
-        static_cast<ofGLRenderer*>(window->renderer().get())->setup();
-    }
+        static_cast<ofMetalProgrammableRenderer*>(window->renderer().get())->setup(window->getSettings());
+   
     
     ofxiOSAlerts.addListener(app.get());
     
@@ -153,6 +150,7 @@ static ofxiOSMTKView * _instanceRef = nil;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    [self resizeDrawable:self.window.screen.nativeScale];
     [self updateDimensions];
     
     [super notifyResized];
@@ -175,12 +173,17 @@ static ofxiOSMTKView * _instanceRef = nil;
     [self setMSAA:on sampleCount:4];
 }
 
+- (void)setPreferredFPS:(int)fps {
+    _displayLink.preferredFramesPerSecond = fps;
+}
+
 - (void) setMSAA:(bool)on sampleCount:(int)sampeles
 {
     if(on)
         self.sampleCount = sampeles;
     else
         self.sampleCount = 1;
+    _displayLink.anti
 }
 
 - (void)notifyResized {
@@ -405,6 +408,79 @@ static ofxiOSMTKView * _instanceRef = nil;
     return nil;
 }
 
+- (void)setPaused:(BOOL)paused
+{
+    super.paused = paused;
+
+    _displayLink.paused = paused;
+}
+
+- (void)didMoveToWindow
+{
+    [super didMoveToWindow];
+    
+    if(self.window == nil)
+        {
+            // If moving off of a window destroy the display link.
+            [_displayLink invalidate];
+            _displayLink = nil;
+            return;
+        }
+
+        [self setupCADisplayLinkForScreen:self.window.screen];
+
+
+        // CADisplayLink callbacks are associated with an 'NSRunLoop'. The currentRunLoop is the
+        // the main run loop (since 'didMoveToWindow' is always executed from the main thread.
+        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    
+        [self resizeDrawable:self.window.screen.nativeScale];
+
+}
+
+- (void)setupCADisplayLinkForScreen:(UIScreen*)screen
+{
+    [self stopRenderLoop];
+
+    _displayLink = [screen displayLinkWithTarget:self selector:@selector(render)];
+
+    _displayLink.paused = self.paused;
+
+    _displayLink.preferredFramesPerSecond = 60;
+}
+
+- (void)didEnterBackground:(NSNotification*)notification
+{
+    self.paused = YES;
+}
+
+- (void)willEnterForeground:(NSNotification*)notification
+{
+    self.paused = NO;
+}
+
+- (void)stopRenderLoop
+{
+    [_displayLink invalidate];
+}
+
+- (void)setContentScaleFactor:(CGFloat)contentScaleFactor
+{
+    [super setContentScaleFactor:contentScaleFactor];
+    [self resizeDrawable:self.window.screen.nativeScale];
+}
+
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    [self resizeDrawable:self.window.screen.nativeScale];
+}
+
+- (void)setBounds:(CGRect)bounds
+{
+    [super setBounds:bounds];
+    [self resizeDrawable:self.window.screen.nativeScale];
+}
 
 
 @end

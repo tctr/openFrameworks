@@ -1,5 +1,5 @@
 //
-//  ofxiOSMTKView.h
+//  ofxiOSMetalView.h
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
@@ -12,13 +12,13 @@
 #import <MetalKit/MetalKit.h>
 #import <Metal/Metal.h>
 #include <glm/glm.hpp>
-#include "EAMTKView.h"
+#include "ofxMetalView.h"
 
 
 class ofxiOSApp;
 class ofAppiOSWindow;
 
-@interface ofxiOSMTKView : EAMTKView {
+@interface ofxiOSMetalView : ofxMetalView {
 
 @protected
     NSMutableDictionary * activeTouches;
@@ -31,21 +31,22 @@ class ofAppiOSWindow;
 @property (readonly, nonatomic, getter=getWindowSize) glm::vec2 * windowSize;
 @property (readonly, nonatomic, getter=getWindowPosition) glm::vec2 * windowPos;
 
-+ (ofxiOSMTKView *) getInstance;
++ (ofxiOSMetalView *) getInstance;
 
 - (id)initWithFrame:(CGRect)frame
              andApp:(ofxiOSApp *)app;
-- (id)initWithFrame:(CGRect)frame
-             andApp:(ofxiOSApp *)app
-         sharegroup:(EAGLSharegroup *)sharegroup;
+
 - (void)setup;
 - (void)update;
 - (void)draw;
 - (void)setMSAA:(bool)on;
+- (void)setPreferredFPS:(int)fps;
 - (void)updateDimensions;
 - (void)destroy;
 - (CGPoint)orientateTouchPoint:(CGPoint)touchPoint;
 - (void)resetTouches;
 - (UIImage*)getSnapshot;
+
+- (void)setPaused:(BOOL)paused;
 
 @end

@@ -1,5 +1,5 @@
 //
-//  ofxiOSMTKView.h
+//  ofxiOSMetalView.h
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
@@ -22,7 +22,7 @@ public:
     ,enableHardwareOrientation(false)
     ,enableHardwareOrientationAnimation(false)
     ,enableSetupScreen(true)
-    ,windowControllerType(ofxiOSWindowControllerType::CORE_ANIMATION)
+    ,windowControllerType(ofxiOSWindowControllerType::METAL_KIT)
     ,colorType(ofxiOSRendererColorFormat::RGBA8888)
     ,depthType(ofxiOSRendererDepthFormat::DEPTH_NONE)
     ,stencilType(ofxiOSRendererStencilFormat::STENCIL_NONE)
@@ -41,7 +41,7 @@ public:
     ,enableHardwareOrientation(false)
     ,enableHardwareOrientationAnimation(false)
     ,enableSetupScreen(true)
-    ,windowControllerType(ofxiOSWindowControllerType::CORE_ANIMATION)
+    ,windowControllerType(ofxiOSWindowControllerType::METAL_KIT)
     ,colorType(ofxiOSRendererColorFormat::RGBA8888)
     ,depthType(ofxiOSRendererDepthFormat::DEPTH_NONE)
     ,stencilType(ofxiOSRendererStencilFormat::STENCIL_NONE)
@@ -56,7 +56,7 @@ public:
             enableHardwareOrientationAnimation = false;
             enableSetupScreen = true;
             setupOrientation = OF_ORIENTATION_DEFAULT;
-            windowControllerType = windowControllerType;
+            windowControllerType = METAL_KIT;
             colorType = ofxiOSRendererColorFormat::RGBA8888;
             depthType = ofxiOSRendererDepthFormat::DEPTH_NONE;
             stencilType = ofxiOSRendererStencilFormat::STENCIL_NONE;
@@ -104,7 +104,7 @@ public:
     void setup();
     
     void run(ofBaseApp * appPtr);
-    OF_DEPRECATED_MSG("Use setup(const ofiOSWindowSettings & settings); instead.", virtual void setupOpenGL(int w, int h, ofWindowMode screenMode) );
+
     static void startAppWithDelegate(std::string appDelegateClassName);
     void update();
     void draw();
@@ -138,7 +138,7 @@ public:
     
     ofiOSMetalWindowSettings & getSettings();
     ofCoreEvents & events();
-    std::shared_ptr<ofBaseMetalRenderer> & renderer();
+    std::shared_ptr<ofBaseRenderer> & renderer();
     
     virtual void setWindowTitle(std::string title);
     
@@ -179,7 +179,7 @@ public:
 protected:
     
     ofCoreEvents coreEvents;
-    std::shared_ptr<ofBaseMetalRenderer> currentRenderer;
+    std::shared_ptr<ofBaseRenderer> currentRenderer;
     ofiOSMetalWindowSettings settings;
 
     ofOrientation orientation;

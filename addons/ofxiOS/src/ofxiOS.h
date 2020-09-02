@@ -40,17 +40,23 @@
 
 #ifndef TARGET_OF_TVOS
 
-#include "ofAppiOSWindow.h"
 #include "ofxiOSConstants.h"
 #include "ofxiOSExtensions.h"
+
+#include "ofxMetalDelegate.h"
+#include "ofAppiOSMetalWindow.h"
+#include "ofxiOSMetalViewController.h"
+#include "ofxiOSMetalView.h"
+
 #include "ofxiOSAppDelegate.h"
+#include "ofAppiOSWindow.h"
 #include "ofxiOSViewController.h"
 #include "ofxiOSGLKViewController.h"
 #include "ofxiOSGLKView.h"
-#include "ofxiOSMTKViewController.h"
-#include "ofxiOSMTKView.h"
 #include "ofxiOSEAGLView.h"
+
 #include "ofxiOSApp.h"
+
 #include "ofxiOSExtras.h"
 #include "ofxAccelerometer.h"
 

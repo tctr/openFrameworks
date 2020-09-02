@@ -1,5 +1,5 @@
 //
-//  ofxiOSMTKViewController.mm
+//  ofxiOSMetalViewController.mm
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
@@ -8,33 +8,32 @@
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS || (TARGET_OS_IPHONE && !TARGET_OS_TV)
 
-#import "ofxiOSMTKViewController.h"
+#import "ofxiOSMetalViewController.h"
 
-#include "ofxiOSMTKView.h"
+#include "ofxiOSMetalView.h"
 #import "ofxiOSExtras.h"
 #include "ofAppiOSWindow.h"
 
-@interface ofxiOSMTKViewController() <MTKViewDelegate>{
+@interface ofxiOSMetalViewController(){
     UIInterfaceOrientation currentInterfaceOrientation;
     UIInterfaceOrientation pendingInterfaceOrientation;
     BOOL bReadyToRotate;
     BOOL bFirstUpdate;
     BOOL bAnimated;
+    
+    
 }
 @end
 
-@implementation ofxiOSMTKViewController
+@implementation ofxiOSMetalViewController
 {
     MTKView *_view;
 }
 
-@synthesize mtkview;
+@synthesize metalView;
 
 - (id)initWithFrame:(CGRect)frame app:(ofxiOSApp *)app {
-    return [self initWithFrame:frame app:app sharegroup:nil];
-}
-
-- (id)initWithFrame:(CGRect)frame app:(ofxiOSApp *)app sharegroup:(EAGLSharegroup *)sharegroup{
+    
     currentInterfaceOrientation = pendingInterfaceOrientation = UIInterfaceOrientationPortrait;
     if((self = [super init])) {
         
@@ -47,17 +46,17 @@
         bFirstUpdate    = NO;
         bAnimated       = NO;
         
-        self.mtkview = [[[ofxiOSMTKView alloc] initWithFrame:frame andApp:app sharegroup:sharegroup] autorelease];
-       // self.mtkview.delegate = self;
+        self.metalView = [[[ofxiOSMetalView alloc] initWithFrame:frame andApp:app] autorelease];
+        self.metalView.delegate = self;
     }
     
     return self;
 }
 
 - (void) dealloc {
-    [self.mtkview removeFromSuperview];
-    self.mtkview.delegate = nil;
-    self.mtkview = nil;
+    [self.metalView removeFromSuperview];
+    self.metalView.delegate = nil;
+    self.metalView = nil;
     
     [super dealloc];
 }
@@ -74,7 +73,7 @@
     else
         [_view setMultipleTouchEnabled:YES];
     //[view bindDrawable];
-    [self.mtkview setup];
+    [self.metalView setup];
 }
 
 
@@ -101,21 +100,21 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.mtkview resetTouches];
+    [self.metalView resetTouches];
 }
 
 //- (void)glkViewControllerUpdate:(GLKViewController *)controller {
-//    [self.mtkview update];
+//    [self.metalView update];
 //}
 //
 //- (void)glkViewController:(GLKViewController *)controller willPause:(BOOL)pause {
 //
 //}
 
-- (void) mtkview:(MTKView *)view drawInRect:(CGRect)rect
+- (void) metalView:(MTKView *)view drawInRect:(CGRect)rect
 {
     //[view bindDrawable];
-    [self.mtkview draw];
+    [self.metalView draw];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -140,38 +139,28 @@
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    if(self.mtkview != nil)
-        [self.mtkview touchesBegan:touches withEvent:event];
+    if(self.metalView != nil)
+        [self.metalView touchesBegan:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.mtkview != nil)
-        [self.mtkview touchesMoved:touches withEvent:event];
+    if(self.metalView != nil)
+        [self.metalView touchesMoved:touches withEvent:event];
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.mtkview != nil)
-        [self.mtkview touchesEnded:touches withEvent:event];
+    if(self.metalView != nil)
+        [self.metalView touchesEnded:touches withEvent:event];
 }
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.mtkview != nil)
-        [self.mtkview touchesCancelled:touches withEvent:event];
+    if(self.metalView != nil)
+        [self.metalView touchesCancelled:touches withEvent:event];
 }
 #ifdef __IPHONE_9_1
 - (void)touchesEstimatedPropertiesUpdated:(NSSet<UITouch *> *)touches {
-    if(self.mtkview != nil)
-        [self.mtkview touchesEstimatedPropertiesUpdated:touches];
+    if(self.metalView != nil)
+        [self.metalView touchesEstimatedPropertiesUpdated:touches];
 }
 #endif
-
-- (EAGLSharegroup *)getSharegroup {
-//    if(self.mtkview != nil) {
-//        EAGLContext * context = [self.mtkview context];
-//        if(context)
-//            return [context sharegroup];
-//    }
-    return nil;
-}
-
 
 //-------------------------------------------------------------- glView callbacks.
 - (void)mtkViewAnimationStarted {
@@ -230,8 +219,8 @@
             bounds.size.width   = screenSize.height;
             bounds.size.height  = screenSize.width;
         }
-        self.mtkview.bounds = bounds;
-        [self.mtkview updateDimensions];
+        self.metalView.bounds = bounds;
+        [self.metalView updateDimensions];
         
         return;
     }
@@ -248,8 +237,8 @@
             bounds.size.width   = screenSize.height;
             bounds.size.height  = screenSize.width;
         }
-        self.mtkview.bounds = bounds;
-        [self.mtkview updateDimensions];
+        self.metalView.bounds = bounds;
+        [self.metalView updateDimensions];
     }
     
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
@@ -297,7 +286,7 @@
     float rot2 = [self rotationForOrientation:interfaceOrientation];
     float rot3 = rot2 - rot1;
     CGAffineTransform rotate = CGAffineTransformMakeRotation(rot3);
-    rotate = CGAffineTransformConcat(rotate, self.mtkview.transform);
+    rotate = CGAffineTransformConcat(rotate, self.metalView.transform);
     
     if(animated) {
         NSTimeInterval duration = 0.3;
@@ -305,22 +294,22 @@
            (UIInterfaceOrientationIsPortrait(currentInterfaceOrientation) && UIInterfaceOrientationIsPortrait(interfaceOrientation))) {
             duration = 0.6;
         }
-        [self.mtkview.layer removeAllAnimations];
+        [self.metalView.layer removeAllAnimations];
         [UIView animateWithDuration:duration animations:^{
-            self.mtkview.center = center;
-            self.mtkview.transform = rotate;
-            self.mtkview.bounds = bounds;
+            self.metalView.center = center;
+            self.metalView.transform = rotate;
+            self.metalView.bounds = bounds;
         }];
     } else {
-        self.mtkview.center = center;
-        self.mtkview.transform = rotate;
-        self.mtkview.bounds = bounds;
+        self.metalView.center = center;
+        self.metalView.transform = rotate;
+        self.metalView.bounds = bounds;
     }
     
     currentInterfaceOrientation = interfaceOrientation;
     bFirstUpdate = NO;
     
-    [self.mtkview updateDimensions];
+    [self.metalView updateDimensions];
 }
 
 
@@ -373,14 +362,14 @@
     
     if(bAnimated) {
         NSTimeInterval duration = 0.3;
-        [self.mtkview.layer removeAllAnimations];
+        [self.metalView.layer removeAllAnimations];
         [UIView animateWithDuration:duration animations:^{
-            self.mtkview.center = center;
-            self.mtkview.transform = CGAffineTransformMakeRotation(0);
+            self.metalView.center = center;
+            self.metalView.transform = CGAffineTransformMakeRotation(0);
         }];
     } else {
-        self.mtkview.center = center;
-        self.mtkview.transform = CGAffineTransformMakeRotation(0);
+        self.metalView.center = center;
+        self.metalView.transform = CGAffineTransformMakeRotation(0);
     }
 }
 
@@ -400,16 +389,16 @@
     
     if(bAnimated) {
         NSTimeInterval duration = 0.3;
-        [self.mtkview.layer removeAllAnimations];
+        [self.metalView.layer removeAllAnimations];
         [UIView animateWithDuration:duration animations:^{
-            self.mtkview.center = center;
-            self.mtkview.transform = CGAffineTransformMakeRotation(0);
-            self.mtkview.frame = CGRectMake(0, 0, size.width,size.height);
+            self.metalView.center = center;
+            self.metalView.transform = CGAffineTransformMakeRotation(0);
+            self.metalView.frame = CGRectMake(0, 0, size.width,size.height);
         }];
     } else {
-        self.mtkview.center = center;
-        self.mtkview.transform = CGAffineTransformMakeRotation(0);
-        self.mtkview.frame = CGRectMake(0, 0, size.width,size.height);
+        self.metalView.center = center;
+        self.metalView.transform = CGAffineTransformMakeRotation(0);
+        self.metalView.frame = CGRectMake(0, 0, size.width,size.height);
     }
 }
 #endif
@@ -465,14 +454,14 @@
 #endif
 
 - (void)setPreferredFPS:(int)fps {
-    if(self.mtkview != nil) {
-        self.mtkview.preferredFramesPerSecond = fps;
+    if(self.metalView != nil) {
+        [self.metalView setPreferredFPS:fps];
     }
 }
 
 - (void)setMSAA:(bool)value {
-    if(self.mtkview != nil) {
-        [self.mtkview setMSAA:value];
+    if(self.metalView != nil) {
+        [self.metalView setMSAA:value];
     }
 }
 

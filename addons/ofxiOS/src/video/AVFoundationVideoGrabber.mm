@@ -529,7 +529,7 @@ std::vector <ofVideoDevice> AVFoundationVideoGrabber::listDevices() {
 }
 
 void AVFoundationVideoGrabber::setDevice(int deviceID) {
-	[grabber setDevice:deviceID];
+	//[grabber setDevice:deviceID];
 	device = deviceID;
 }
 

@@ -108,7 +108,7 @@ public:
 	///        this renderer.
 	/// \param primCount Specifies the number of instances of the specified
 	/// range of indices to be rendered.
-	virtual void drawInstanced(const ofVboMesh & mesh, ofPolyRenderMode renderType, int primCount) const=0;
+	virtual void drawInstanced(const ofVboMesh & mesh, ofPolyRenderMode renderType, int primCount);
 
 	/// \section Textures
 
@@ -360,7 +360,7 @@ public:
 	/// \param attachmentPoint The attatchement point to use when binding.
 	/// \warning This method is unavailable when using OpenGLES.
 	/// \sa https://en.wikipedia.org/wiki/Bit_blit
-	virtual void bindForBlitting(const ofFbo & fboSrc, ofFbo & fboDst, int attachmentPoint=0)=0;
+	virtual void bindForBlitting(const ofFbo & fboSrc, ofFbo & fboDst, int attachmentPoint=0);
 #endif
 
 	/// \section Setting The Render Surface

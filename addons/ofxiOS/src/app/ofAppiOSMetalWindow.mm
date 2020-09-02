@@ -1,11 +1,12 @@
 //
-//  ofxiOSMTKView.h
+//  ofxiOSMetalView.h
 //  iPhone+OF Static Library
 //
 //  Created by Dan Rosser (147) on 24/6/20.
 //
 #include <TargetConditionals.h>
-#include "ofAppBaseMetalWindow.h"
+#include "ofAppiOSMetalWindow.h"
+#include "ofMetalProgrammableRenderer.h"
 //#include "ofGLRenderer.h"
 //#include "ofGLRenderer.h"
 //#include "ofGLProgrammableRenderer.h"
@@ -19,7 +20,7 @@
     #include "ofxtvOSViewController.h"
     const std::string appDelegateName = "ofxtvOSAppDelegate";
 #endif
-#include "ofxiOSMTKView.h"
+#include "ofxiOSMetalView.h"
 #include "ofxiOSGLKView.h"
 #include "ofxiOSEAGLView.h"
 
@@ -62,6 +63,19 @@ void ofAppiOSMetalWindow::setup(const ofWindowSettings & _settings) {
     }
 }
 
+void ofAppiOSMetalWindow::setup(const ofMetalWindowSettings & _settings) {
+    const ofiOSMetalWindowSettings * metalSettings = dynamic_cast<const ofiOSMetalWindowSettings*>(&_settings);
+    if(settings.setupOrientation == OF_ORIENTATION_UNKNOWN) {
+        settings.setupOrientation = OF_ORIENTATION_DEFAULT;
+    }
+    setOrientation(settings.setupOrientation);
+    
+    currentRenderer = std::shared_ptr<ofBaseRenderer>(new ofMetalProgrammableRenderer(this));
+    
+    
+    hasExited = false;
+}
+
 
 void ofAppiOSMetalWindow::setup() {
 	
@@ -71,17 +85,12 @@ void ofAppiOSMetalWindow::setup() {
 	}
 	setOrientation(settings.setupOrientation);
 	
-    currentRenderer = std::shared_ptr<ofBaseMetalRenderer>(new ofMetalProgrammableRenderer(this));
+    currentRenderer = std::shared_ptr<ofBaseRenderer>(new ofMetalProgrammableRenderer(this));
 	
 	
 	hasExited = false;
 }
 
-//----------------------------------------------------------------------------------- opengl setup.
-void ofAppiOSMetalWindow::setupOpenGL(int w, int h, ofWindowMode screenMode) {
-	settings.windowMode = screenMode; // use this as flag for displaying status bar or not
-    setup(settings);
-}
 
 void ofAppiOSMetalWindow::loop() {
     startAppWithDelegate(appDelegateName);
@@ -131,7 +140,7 @@ void ofAppiOSMetalWindow::setWindowShape(int w, int h) {
 
 glm::vec2	ofAppiOSMetalWindow::getWindowPosition() {
 	if(settings.windowControllerType == METAL_KIT)
-        return *[[ofxiOSMTKView getInstance] getWindowPosition];
+        return *[[ofxiOSMetalView getInstance] getWindowPosition];
     else if(settings.windowControllerType == GL_KIT)
 		return *[[ofxiOSGLKView getInstance] getWindowPosition];
 	else
@@ -139,12 +148,12 @@ glm::vec2	ofAppiOSMetalWindow::getWindowPosition() {
 }
 
 glm::vec2	ofAppiOSMetalWindow::getWindowSize() {
-        return *[[ofxiOSMTKView getInstance] getWindowSize];
+        return *[[ofxiOSMetalView getInstance] getWindowSize];
 }
 
 glm::vec2	ofAppiOSMetalWindow::getScreenSize() {
 
-        return *[[ofxiOSMTKView getInstance] getWindowSize];
+        return *[[ofxiOSMetalView getInstance] getWindowSize];
 
 }
 
@@ -209,7 +218,7 @@ void ofAppiOSMetalWindow::setOrientation(ofOrientation toOrientation) {
 //	if([uiViewController isKindOfClass:[ofxiOSViewController class]] == YES) {
 //		ofxiOSViewController * glViewController = (ofxiOSMetalViewController*)uiViewController;
 //		if(glViewController) {
-//			ofxiOSMTKView * glView = mtkViewController.glView;
+//			ofxiOSMetalView * glView = mtkViewController.glView;
 //			if(settings.enableHardwareOrientation == true) {
 //				[glViewController rotateToInterfaceOrientation:interfaceOrientation animated:settings.enableHardwareOrientationAnimation];
 //			} else {
@@ -359,8 +368,8 @@ void ofAppiOSMetalWindow::enableMultiTouch(bool isOn) {
 	settings.enableMultiTouch = isOn;
 #if TARGET_OS_IOS || (TARGET_OS_IPHONE && !TARGET_OS_TV)
     if(settings.windowControllerType == METAL_KIT) {
-        if([ofxiOSMTKView getInstance]) {
-            [[ofxiOSMTKView getInstance] setMultipleTouchEnabled:isOn];
+        if([ofxiOSMetalView getInstance]) {
+            [[ofxiOSMetalView getInstance] setMultipleTouchEnabled:isOn];
         }
     }
 #endif
@@ -404,7 +413,7 @@ ofCoreEvents & ofAppiOSMetalWindow::events(){
 }
 
 //-----------------------------------------------------------------------------------
-std::shared_ptr<ofBaseMetalRenderer> & ofAppiOSMetalWindow::renderer(){
+std::shared_ptr<ofBaseRenderer> & ofAppiOSMetalWindow::renderer(){
     return currentRenderer;
 }
 

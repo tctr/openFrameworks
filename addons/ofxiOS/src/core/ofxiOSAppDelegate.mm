@@ -38,7 +38,9 @@
 #include "ofxiOSExtras.h"
 #include "ofxiOSAlerts.h"
 #include "ofxiOSEAGLView.h"
+#include "ofxiOSMetalView.h"
 #include "ofAppiOSWindow.h"
+#include "ofAppiOSMetalWindow.h"
 #include "ofAppRunner.h"
 #include "ofUtils.h"
 #include "ofLog.h"
@@ -143,7 +145,8 @@
 		
 		switch(ofxiOSGetOFWindow()->getWindowControllerType()) {
 			case METAL_KIT:
-				NSLog(@"No MetalKit yet supported for openFrameworks: Falling back to GLKit");
+				self.uiViewController = (UIViewController*)[[[ofxiOSMetalViewController alloc] initWithFrame:frame app:(ofxiOSApp *)ofGetAppPtr()] autorelease];
+                break;
 			case GL_KIT:
 				self.uiViewController = (UIViewController*)[[[ofxiOSGLKViewController alloc] initWithFrame:frame app:(ofxiOSApp *)ofGetAppPtr() sharegroup:nil] autorelease];
 				break;
