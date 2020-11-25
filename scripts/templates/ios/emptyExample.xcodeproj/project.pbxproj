@@ -71,7 +71,6 @@
 			<key>files</key>
 			<array>
 				<string>9969E7561C782C4500DEF0F6</string>
-				<string>E41D421413B3A95300A75A5D</string>
 				<string>901808C12053638E004A7774</string>
 				<string>1D60589F0D05DD5A006BFB54</string>
 				<string>1DF5F4E00D08C38300B7A737</string>
@@ -143,6 +142,8 @@
 				<string>AppIcon</string>
 				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
 				<string>Brand Assets</string>
+				<key>CLANG_ENABLE_OBJC_WEAK</key>
+				<string>YES</string>
 				<key>FRAMEWORK_SEARCH_PATHS</key>
 				<array>
 					<string>$(inherited)</string>
@@ -157,7 +158,9 @@
 				<key>INFOPLIST_FILE</key>
 				<string>ofxiOS-Info.plist</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
+				<string>12.0</string>
+				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
+				<string>${PRODUCT_NAME:rfc1034identifier}</string>
 				<key>PRODUCT_NAME</key>
 				<string>${TARGET_NAME}</string>
 				<key>TARGETED_DEVICE_FAMILY</key>
@@ -178,6 +181,8 @@
 				<string>AppIcon</string>
 				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
 				<string>Brand Assets</string>
+				<key>CLANG_ENABLE_OBJC_WEAK</key>
+				<string>YES</string>
 				<key>FRAMEWORK_SEARCH_PATHS</key>
 				<array>
 					<string>$(inherited)</string>
@@ -192,7 +197,9 @@
 				<key>INFOPLIST_FILE</key>
 				<string>ofxiOS-Info.plist</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
+				<string>12.0</string>
+				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
+				<string>${PRODUCT_NAME:rfc1034identifier}</string>
 				<key>PRODUCT_NAME</key>
 				<string>${TARGET_NAME}</string>
 				<key>TARGETED_DEVICE_FAMILY</key>
@@ -271,24 +278,25 @@
 			<key>attributes</key>
 			<dict>
 				<key>LastUpgradeCheck</key>
-				<string>0600</string>
+				<string>1220</string>
 			</dict>
 			<key>buildConfigurationList</key>
 			<string>C01FCF4E08A954540054247B</string>
 			<key>compatibilityVersion</key>
 			<string>Xcode 3.2</string>
 			<key>developmentRegion</key>
-			<string>English</string>
+			<string>en</string>
 			<key>hasScannedForEncodings</key>
 			<string>1</string>
 			<key>isa</key>
 			<string>PBXProject</string>
 			<key>knownRegions</key>
 			<array>
-				<string>English</string>
-				<string>Japanese</string>
-				<string>French</string>
-				<string>German</string>
+				<string>de</string>
+				<string>ja</string>
+				<string>fr</string>
+				<string>Base</string>
+				<string>en</string>
 			</array>
 			<key>mainGroup</key>
 			<string>29B97314FDCFA39411CA2CEA</string>
@@ -713,8 +721,46 @@
 			<dict>
 				<key>ALWAYS_SEARCH_USER_PATHS</key>
 				<string>YES</string>
+				<key>CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED</key>
+				<string>YES</string>
 				<key>CLANG_CXX_LIBRARY</key>
 				<string>libc++</string>
+				<key>CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_COMMA</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS</key>
+				<string>YES</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INFINITE_RECURSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_NON_LITERAL_NULL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_LITERAL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER</key>
+				<string>YES</string>
+				<key>CLANG_WARN_RANGE_LOOP_ANALYSIS</key>
+				<string>YES</string>
+				<key>CLANG_WARN_STRICT_PROTOTYPES</key>
+				<string>YES</string>
+				<key>CLANG_WARN_SUSPICIOUS_MOVE</key>
+				<string>YES</string>
+				<key>CLANG_WARN_UNREACHABLE_CODE</key>
+				<string>YES</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
 				<key>CODE_SIGN_IDENTITY</key>
 				<string></string>
 				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
@@ -723,12 +769,20 @@
 				<string></string>
 				<key>COMPRESS_PNG_FILES</key>
 				<string>NO</string>
+				<key>ENABLE_STRICT_OBJC_MSGSEND</key>
+				<string>YES</string>
+				<key>ENABLE_TESTABILITY</key>
+				<string>YES</string>
 				<key>GCC_C_LANGUAGE_STANDARD</key>
 				<string>c11</string>
+				<key>GCC_NO_COMMON_BLOCKS</key>
+				<string>YES</string>
 				<key>GCC_OPTIMIZATION_LEVEL</key>
 				<string>0</string>
 				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
 				<string>NO</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
 				<key>GCC_WARN_64_TO_32_BIT_CONVERSION[arch=*64]</key>
 				<string>NO</string>
 				<key>GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO</key>
@@ -741,10 +795,16 @@
 				<string>NO</string>
 				<key>GCC_WARN_PROTOTYPE_CONVERSION</key>
 				<string>NO</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
 				<key>GCC_WARN_UNUSED_VARIABLE</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
+				<string>12.0</string>
 				<key>ONLY_ACTIVE_ARCH</key>
 				<string>YES</string>
 				<key>PROVISIONING_PROFILE[sdk=iphoneos*]</key>
@@ -771,8 +831,46 @@
 			<dict>
 				<key>ALWAYS_SEARCH_USER_PATHS</key>
 				<string>YES</string>
+				<key>CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED</key>
+				<string>YES</string>
 				<key>CLANG_CXX_LIBRARY</key>
 				<string>libc++</string>
+				<key>CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_COMMA</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS</key>
+				<string>YES</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INFINITE_RECURSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_NON_LITERAL_NULL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_LITERAL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER</key>
+				<string>YES</string>
+				<key>CLANG_WARN_RANGE_LOOP_ANALYSIS</key>
+				<string>YES</string>
+				<key>CLANG_WARN_STRICT_PROTOTYPES</key>
+				<string>YES</string>
+				<key>CLANG_WARN_SUSPICIOUS_MOVE</key>
+				<string>YES</string>
+				<key>CLANG_WARN_UNREACHABLE_CODE</key>
+				<string>YES</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
 				<key>CODE_SIGN_IDENTITY</key>
 				<string></string>
 				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
@@ -781,26 +879,38 @@
 				<string></string>
 				<key>COMPRESS_PNG_FILES</key>
 				<string>NO</string>
+				<key>ENABLE_STRICT_OBJC_MSGSEND</key>
+				<string>YES</string>
 				<key>GCC_C_LANGUAGE_STANDARD</key>
 				<string>c11</string>
 				<key>GCC_DYNAMIC_NO_PIC</key>
 				<string>NO</string>
 				<key>GCC_GENERATE_DEBUGGING_SYMBOLS</key>
 				<string>NO</string>
+				<key>GCC_NO_COMMON_BLOCKS</key>
+				<string>YES</string>
 				<key>GCC_OPTIMIZATION_LEVEL</key>
 				<string>s</string>
 				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
 				<string>NO</string>
 				<key>GCC_THUMB_SUPPORT</key>
 				<string>NO</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
 				<key>GCC_WARN_64_TO_32_BIT_CONVERSION[arch=*64]</key>
 				<string>NO</string>
 				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
 				<string>YES</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
 				<key>GCC_WARN_UNUSED_VARIABLE</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
+				<string>12.0</string>
 				<key>ONLY_ACTIVE_ARCH</key>
 				<string>NO</string>
 				<key>SDKROOT</key>

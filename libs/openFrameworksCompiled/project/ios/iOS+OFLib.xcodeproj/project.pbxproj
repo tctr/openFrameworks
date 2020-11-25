@@ -1072,24 +1072,25 @@
 			<key>attributes</key>
 			<dict>
 				<key>LastUpgradeCheck</key>
-				<string>0920</string>
+				<string>1220</string>
 			</dict>
 			<key>buildConfigurationList</key>
 			<string>C01FCF4E08A954540054247B</string>
 			<key>compatibilityVersion</key>
 			<string>Xcode 3.2</string>
 			<key>developmentRegion</key>
-			<string>English</string>
+			<string>en</string>
 			<key>hasScannedForEncodings</key>
 			<string>1</string>
 			<key>isa</key>
 			<string>PBXProject</string>
 			<key>knownRegions</key>
 			<array>
-				<string>English</string>
-				<string>Japanese</string>
-				<string>French</string>
-				<string>German</string>
+				<string>en</string>
+				<string>ja</string>
+				<string>de</string>
+				<string>fr</string>
+				<string>Base</string>
 			</array>
 			<key>mainGroup</key>
 			<string>29B97314FDCFA39411CA2CEA</string>
@@ -2840,6 +2841,8 @@
 		<dict>
 			<key>buildSettings</key>
 			<dict>
+				<key>CLANG_ENABLE_OBJC_WEAK</key>
+				<string>YES</string>
 				<key>CONFIGURATION_BUILD_DIR</key>
 				<string>$(SRCROOT)/../../lib/ios/</string>
 				<key>COPY_PHASE_STRIP</key>
@@ -2859,7 +2862,7 @@
 				<key>GCC_WARN_NON_VIRTUAL_DESTRUCTOR</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>8.0</string>
+				<string>12.0</string>
 				<key>LIBRARY_SEARCH_PATHS</key>
 				<array>
 					<string>$(inherited)</string>
@@ -2886,6 +2889,8 @@
 			<dict>
 				<key>ARCHS</key>
 				<string>$(ARCHS_STANDARD)</string>
+				<key>CLANG_ENABLE_OBJC_WEAK</key>
+				<string>YES</string>
 				<key>CONFIGURATION_BUILD_DIR</key>
 				<string>$(SRCROOT)/../../lib/ios/</string>
 				<key>COPY_PHASE_STRIP</key>
@@ -2903,7 +2908,7 @@
 				<key>GCC_WARN_NON_VIRTUAL_DESTRUCTOR</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>8.0</string>
+				<string>12.0</string>
 				<key>LIBRARY_SEARCH_PATHS</key>
 				<array>
 					<string>$(inherited)</string>
@@ -3024,6 +3029,8 @@
 			<dict>
 				<key>ARCHS</key>
 				<string>$(ARCHS_STANDARD)</string>
+				<key>CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED</key>
+				<string>YES</string>
 				<key>CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING</key>
 				<string>YES</string>
 				<key>CLANG_WARN_BOOL_CONVERSION</key>
@@ -3031,6 +3038,8 @@
 				<key>CLANG_WARN_COMMA</key>
 				<string>YES</string>
 				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS</key>
 				<string>YES</string>
 				<key>CLANG_WARN_EMPTY_BODY</key>
 				<string>YES</string>
@@ -3042,7 +3051,11 @@
 				<string>YES</string>
 				<key>CLANG_WARN_NON_LITERAL_NULL_CONVERSION</key>
 				<string>YES</string>
+				<key>CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF</key>
+				<string>YES</string>
 				<key>CLANG_WARN_OBJC_LITERAL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER</key>
 				<string>YES</string>
 				<key>CLANG_WARN_RANGE_LOOP_ANALYSIS</key>
 				<string>YES</string>
@@ -3060,8 +3073,12 @@
 				<string>$(SRCROOT)/../../lib/ios/build/debug/</string>
 				<key>ENABLE_STRICT_OBJC_MSGSEND</key>
 				<string>YES</string>
+				<key>ENABLE_TESTABILITY</key>
+				<string>YES</string>
 				<key>GCC_NO_COMMON_BLOCKS</key>
 				<string>YES</string>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<string>GLES_SILENCE_DEPRECATION=1</string>
 				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
 				<string>YES</string>
 				<key>GCC_WARN_CHECK_SWITCH_STATEMENTS</key>
@@ -3071,7 +3088,7 @@
 				<key>GCC_WARN_UNUSED_FUNCTION</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>8.0</string>
+				<string>12.0</string>
 				<key>OBJROOT</key>
 				<string>$(SRCROOT)/../../lib/ios/build/debug</string>
 				<key>ONLY_ACTIVE_ARCH</key>
@@ -3103,6 +3120,8 @@
 			<dict>
 				<key>ARCHS</key>
 				<string>$(ARCHS_STANDARD)</string>
+				<key>CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED</key>
+				<string>YES</string>
 				<key>CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING</key>
 				<string>YES</string>
 				<key>CLANG_WARN_BOOL_CONVERSION</key>
@@ -3110,6 +3129,8 @@
 				<key>CLANG_WARN_COMMA</key>
 				<string>YES</string>
 				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS</key>
 				<string>YES</string>
 				<key>CLANG_WARN_EMPTY_BODY</key>
 				<string>YES</string>
@@ -3121,7 +3142,11 @@
 				<string>YES</string>
 				<key>CLANG_WARN_NON_LITERAL_NULL_CONVERSION</key>
 				<string>YES</string>
+				<key>CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF</key>
+				<string>YES</string>
 				<key>CLANG_WARN_OBJC_LITERAL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER</key>
 				<string>YES</string>
 				<key>CLANG_WARN_RANGE_LOOP_ANALYSIS</key>
 				<string>YES</string>
@@ -3141,6 +3166,8 @@
 				<string>YES</string>
 				<key>GCC_NO_COMMON_BLOCKS</key>
 				<string>YES</string>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<string>GLES_SILENCE_DEPRECATION=1</string>
 				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
 				<string>YES</string>
 				<key>GCC_WARN_CHECK_SWITCH_STATEMENTS</key>
@@ -3150,7 +3177,7 @@
 				<key>GCC_WARN_UNUSED_FUNCTION</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>8.0</string>
+				<string>12.0</string>
 				<key>OBJROOT</key>
 				<string>$(SRCROOT)/../../lib/ios/build/release</string>
 				<key>ONLY_ACTIVE_ARCH</key>
