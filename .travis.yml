@@ -49,13 +49,13 @@ matrix:
     cache: ccache
 
 
-  - os: linux
-    sudo: required
-    dist: trusty
-    env: TARGET="linuxarmv7l"
-    cache:
-      directories:
-        - ~/.ccache
+  # - os: linux
+  #   sudo: required
+  #   dist: trusty
+  #   env: TARGET="linuxarmv7l"
+  #   cache:
+  #     directories:
+  #       - ~/.ccache
         #- ~/rpi2_toolchain
         # - ~/firmware-master
         #- ~/archlinux
