@@ -458,36 +458,36 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		}
     }
 
-	@Override
-	public boolean dispatchGenericMotionEvent (MotionEvent event){
-		Log.i("OF", "dispatchGenericMotionEvent" + " event:" + event.toString());
-		if (event.isFromSource(InputDevice.SOURCE_CLASS_JOYSTICK)) {
-			if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				// process the joystick movement...
-				final int historySize = event.getHistorySize();
-
-				// Process the movements starting from the
-				// earliest historical position in the batch
-				for (int i = 0; i < historySize; i++) {
-					// Process the event at historical position i
-					processJoystickInput(event, i);
-				}
-				//processJoystickInput(event, -1);
-				return true;
-			}
-		}
-		if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) {
-			switch (event.getAction()) {
-				case MotionEvent.ACTION_HOVER_MOVE:
-					// process the mouse hover movement...
-					return true;
-				case MotionEvent.ACTION_SCROLL:
-					// process the scroll wheel movement...
-					return true;
-			}
-		}
-		return super.onGenericMotionEvent(event);
-	}
+//	@Override
+//	public boolean dispatchGenericMotionEvent (MotionEvent event){
+//		Log.i("OF", "dispatchGenericMotionEvent" + " event:" + event.toString());
+//		if (event.isFromSource(InputDevice.SOURCE_CLASS_JOYSTICK)) {
+//			if (event.getAction() == MotionEvent.ACTION_MOVE) {
+//				// process the joystick movement...
+//				final int historySize = event.getHistorySize();
+//
+//				// Process the movements starting from the
+//				// earliest historical position in the batch
+//				for (int i = 0; i < historySize; i++) {
+//					// Process the event at historical position i
+//					processJoystickInput(event, i);
+//				}
+//				//processJoystickInput(event, -1);
+//				return true;
+//			}
+//		}
+//		if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) {
+//			switch (event.getAction()) {
+//				case MotionEvent.ACTION_HOVER_MOVE:
+//					// process the mouse hover movement...
+//					return true;
+//				case MotionEvent.ACTION_SCROLL:
+//					// process the scroll wheel movement...
+//					return true;
+//			}
+//		}
+//		return super.onGenericMotionEvent(event);
+//	}
 
 	private static float getCenteredAxis(MotionEvent event,
 										 InputDevice device, int axis, int historyPos) {
