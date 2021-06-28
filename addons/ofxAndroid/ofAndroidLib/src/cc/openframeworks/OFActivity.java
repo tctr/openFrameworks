@@ -547,6 +547,23 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		}
 	}
 
+	@RequiresApi(28)
+	private static class OnUnhandledKeyEventListenerWrapper implements View.OnUnhandledKeyEventListener {
+		private ViewCompat.OnUnhandledKeyEventListenerCompat mCompatListener;
+
+		OnUnhandledKeyEventListenerWrapper(ViewCompat.OnUnhandledKeyEventListenerCompat listener) {
+			this.mCompatListener = listener;
+		}
+
+		public boolean onUnhandledKeyEvent(View v, KeyEvent event) {
+			Log.i("OF", "OFActivity:onUnhandledKeyEvent" + " event:" + event.toString());
+			if ((event.getKeyCode() == KeyEvent.KEYCODE_BACK  || event.getKeyCode() == KeyEvent.KEYCODE_MENU || event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_MODE)) {
+				return true;
+			}
+			return this.mCompatListener.onUnhandledKeyEvent(v, event);
+		}
+	}
+
 	public ArrayList<Integer> getGameControllerIds() {
 		ArrayList<Integer> gameControllerDeviceIds = new ArrayList<Integer>();
 		int[] deviceIds = InputDevice.getDeviceIds();
