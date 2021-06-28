@@ -22,6 +22,12 @@ public class OFOrientationListener extends OrientationEventListener {
     }
 
     @Override
+    public void disable() {
+        firstCheck = false;
+        super.disable();
+    }
+
+    @Override
     public void onOrientationChanged(int orientation) {
         checkOrientation();
     }

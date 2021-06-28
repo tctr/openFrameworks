@@ -216,9 +216,10 @@ public class OFAndroidLifeCycleHelper
 	public static void onResume(){
 		Log.i(TAG,"onResume");
 
+		OFAndroid.enableOrientationChangeEvents();
 		OFAndroid.onResume();
 		final OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
-		if(OFAndroidLifeCycle.isSurfaceCreated() == true && glView == null || OFAndroidLifeCycle.isSurfaceCreated() == true && glView != null && !glView.isSetup()){
+		if(OFAndroidLifeCycle.isSurfaceCreated() == true && glView == null || glView != null && !glView.isSetup()){
 			Log.e(TAG,"onResume glView is null or not setup");
 
 			OFAndroid.setupGL(OFAndroid.eglVersion, true);
@@ -229,23 +230,20 @@ public class OFAndroidLifeCycleHelper
 				@Override
 				public void run() {
 					OFAndroid.enableTouchEvents();
-					OFAndroid.enableOrientationChangeEvents();
 					OFAndroid.registerNetworkStateReceiver();
+
 					synchronized (OFAndroidObject.ofObjects) {
 						for (OFAndroidObject object : OFAndroidObject.ofObjects) {
-							object.onResume();
+							if(object != null) object.onResume();
 						}
-
 					}
 					if (OFAndroid.getOrientation() != -1)
 						OFAndroid.setScreenOrientation(OFAndroid.getOrientation());
 
 
-				}
+			}
 			});
 		}
-
-
 	}
 	
 	public static void onPause(){
@@ -255,7 +253,6 @@ public class OFAndroidLifeCycleHelper
 			@Override
 			public void run() {
 				OFAndroid.disableTouchEvents();
-				OFAndroid.disableOrientationChangeEvents();
 				OFAndroid.unregisterNetworkStateReceiver();
 				synchronized (OFAndroidObject.ofObjects) {
 					for(OFAndroidObject object : OFAndroidObject.ofObjects){
@@ -314,7 +311,6 @@ public class OFAndroidLifeCycleHelper
 			@Override
 			public void run() {
 				OFAndroid.disableTouchEvents();
-				OFAndroid.disableOrientationChangeEvents();
 				OFAndroid.unregisterNetworkStateReceiver();
 				synchronized (OFAndroidObject.ofObjects) {
 					for(OFAndroidObject object : OFAndroidObject.ofObjects){

@@ -19,10 +19,12 @@ import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.WindowManager;
 
 class OFEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
 
@@ -440,7 +442,22 @@ class OFGLSurfaceView extends GLSurfaceView {
         super(context);
         setClientVersion();
 
-        mRenderer = new OFAndroidWindow(getWidth(), getHeight());
+        int width = getWidth();
+        int height = getHeight();
+
+//        if(width <= 0 || height <= 0 ) {
+//            try {
+//                DisplayMetrics displayMetrics = new DisplayMetrics();
+//                Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
+//                display.getRealMetrics(displayMetrics);
+//                height = displayMetrics.heightPixels;
+//                width = displayMetrics.widthPixels;
+//            } catch (Exception exception){
+//                Log.w("OF", "Could not get Window for Display ", exception);
+//            }
+//        }
+
+        mRenderer = new OFAndroidWindow(width, height);
         getHolder().setFormat(PixelFormat.OPAQUE);
         OFEGLConfigChooser configChooser = getConfigChooser();
         setEGLConfigChooser(configChooser);
@@ -459,6 +476,7 @@ class OFGLSurfaceView extends GLSurfaceView {
 
     }
 
+
     @Deprecated
     public OFGLSurfaceView(Context context,AttributeSet attributes) {
         super(context,attributes);
@@ -470,10 +488,24 @@ class OFGLSurfaceView extends GLSurfaceView {
         setRenderer(mRenderer);
         setRenderMode(OFGLSurfaceView.RENDERMODE_CONTINUOUSLY);
         display = getDisplay();
+
         post(new Runnable() {
             @Override
             public void run() {
-                mRenderer.setResolution(getWidth(), getHeight(), true);
+                int width = getWidth();
+                int height = getHeight();
+                if(width <= 0 || height <= 0 ) {
+                    try {
+                        DisplayMetrics displayMetrics = new DisplayMetrics();
+                        Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
+                        display.getRealMetrics(displayMetrics);
+                        height = displayMetrics.heightPixels;
+                        width = displayMetrics.widthPixels;
+                    } catch (Exception exception){
+                        Log.w("OF", "Could not get Window for Display ", exception);
+                    }
+                }
+                mRenderer.setResolution(width, height, true);
             }
         });
     }
@@ -691,10 +723,10 @@ class OFAndroidWindow implements GLSurfaceView.Renderer {
             }
         }
 
-		if(hasDestroyed == true) {
+		if(hasDestroyed) {
 		    setup();
         }
-		
+		OFAndroid.updateRefreshRates();
 		return;
     }
 	

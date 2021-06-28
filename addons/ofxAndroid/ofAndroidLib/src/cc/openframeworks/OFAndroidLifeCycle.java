@@ -348,6 +348,8 @@ public class OFAndroidLifeCycle
 		OFGLSurfaceView glView = getGLView();
 		if( glView != null ) {
 			glView.onResume();
+		} else {
+			glCreateSurface(true);
 		}
 		Log.d(TAG, "glResume");
 		pushState(State.resume);

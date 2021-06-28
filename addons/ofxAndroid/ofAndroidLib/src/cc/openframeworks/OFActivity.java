@@ -8,8 +8,11 @@ import android.content.res.Resources;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -108,23 +111,84 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 			displayManager.registerDisplayListener(this, null);
 
 		}
+		OFAndroidLifeCycle.setActivity(this);
+		OFAndroidLifeCycle.init();
+		OFAndroidLifeCycle.glCreate();
+
+		DetermineDisplayConfiguration();
+
+		//create gesture listener
+		//register the two events
+		initView();
+	}
+
+	public void DetermineDisplayDimensions() {
+		try {
+			OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
+			OFAndroid.enableOrientationChangeEvents();
+			if(glView != null) {
+				DisplayMetrics displayMetrics = new DisplayMetrics();
+				getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+				int height = displayMetrics.heightPixels;
+				int width = displayMetrics.widthPixels;
+				int bar = getNavigationBarHeight();
+				if(bar > 256) bar = 0;
+				int barWidth = getNavigationBarHeight();
+				if(barWidth > 256) barWidth = 0; // fixes bug in android display metrics
+				int heightBar = displayMetrics.heightPixels + bar;
+				int widthBar = displayMetrics.widthPixels + barWidth;
+				int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
+				int height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
+				int pixeldpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+				Log.i("OF", "DisplayMetrics: w/h:" +width + "x" + height + " barHeight:" + heightBar + "x barWidth:" + widthBar + " bar:" + bar + " widthBar:" + barWidth + " densityDPI:"  +pixeldpi);
+				Log.i("OF", "DisplayRealMetrics: w/h:" +width_px + "x" + height_px + " pixeldpi:" + pixeldpi);
+				glView.setWindowResize(widthBar, heightBar);
+			}
+		} catch (Exception exception) {
+			Log.w("OF", "Could not get Window for Display ", exception);
+		}
+	}
+
+	public void DetermineDisplayConfiguration() {
 		try {
 			display = getWindowManager().getDefaultDisplay();
 			if(display.isValid()) {
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+					boolean isWideColorGamut = display.isWideColorGamut();
+					Log.i("OF", "Display WideColor Gamut Supported:" +  isWideColorGamut);
+					OFAndroid.wideGamut = isWideColorGamut;
+
+					boolean isHDR = display.isHdr();
+					Log.i("OF", "Display is HDR Supported:" +  isHDR);
+					OFAndroid.hdrScreen = isHDR;
+				}
 				currentRefreshRate = display.getRefreshRate();
 				Log.i("OF", "Display Current RefreshRate :" +  currentRefreshRate);
 
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-					float[] refreshRates = display.getSupportedRefreshRates();
-					highestRefreshRate = currentRefreshRate;
-					for(float refreshRate : refreshRates){
-						Log.i("OF", "Display RefreshRate Supported:" +  refreshRate);
-						if(refreshRate > highestRefreshRate) {
-							highestRefreshRate = refreshRate;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+						Display.Mode[] modes = display.getSupportedModes();
+						Display.Mode currentMode = display.getMode();
+						if(currentRefreshRate != currentMode.getRefreshRate()) {
+							Log.e("OF", "Display Mode: Current Display Mode Refresh Rate not equal to current :" +  currentMode + " refreshRate: [" +  currentMode.getRefreshRate() + "] displayRefreshRate: " + currentRefreshRate);
+						}
+						currentRefreshRate = currentMode.getRefreshRate();
+						for(Display.Mode mode : modes){
+							Log.i("OF", "Display Mode: Supported:" +  mode + " refreshRate: [" + mode.getRefreshRate() + "] mode PhysicalWidth:[" + mode.getPhysicalWidth() + "] mode PhysicalHeight:[" + mode.getPhysicalHeight() + "]");
+							if( mode.getRefreshRate() >= highestRefreshRate) {
+								highestRefreshRate =  mode.getRefreshRate();
+							}
+						}
+					} else { // pre 23 Display Mode
+						float[] refreshRates = display.getSupportedRefreshRates();
+						for(float refreshRate : refreshRates){
+							Log.i("OF", "Display RefreshRate Supported:" +  refreshRate);
+							if(refreshRate >= highestRefreshRate) {
+								highestRefreshRate = refreshRate;
+							}
 						}
 					}
-
-
+					highestRefreshRate = currentRefreshRate;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 						boolean isWideColorGamut = display.isWideColorGamut();
 						Log.i("OF", "Display WideColor Gamut Supported:" +  isWideColorGamut);
@@ -138,11 +202,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
 						supportedModes = display.getSupportedModes();
 					}
-					for(Display.Mode mode : supportedModes){
-						Log.i("OF", "Could not get Window fo:" +  mode);
-					}
-
-
+//					for(Display.Mode mode : supportedModes){
+//						Log.i("OF", "Could not get Window fo:" +  mode);
+//					}
 				}
 			} else {
 				Log.w("OF", "Display is not valid yet");
@@ -150,30 +212,15 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		} catch (Exception exception) {
 			Log.w("OF", "Could not get Window for Display ", exception);
 		}
-
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
 			if(getWindow() != null && getWindow().isWideColorGamut()) {
 				OFAndroid.wideGamut = true;
 			}
-//			if(getWindow() != null && ) {
-//				OFAndroid. = true;
-//			}
 			OFAndroid.hdrScreen = false;
 		}
 
-
-
-		OFAndroidLifeCycle.setActivity(this);
-		OFAndroidLifeCycle.init();
-		OFAndroidLifeCycle.glCreate();
-
 		OFAndroid.deviceRefreshRate((int)currentRefreshRate);
 		OFAndroid.deviceHighestRefreshRate((int)highestRefreshRate);
-
-		//create gesture listener
-		//register the two events
-		initView();
 	}
 
 
@@ -193,55 +240,8 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		try {
 			display = getWindowManager().getDefaultDisplay();
 			if (display.isValid()) {
-
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-					boolean isWideColorGamut = display.isWideColorGamut();
-					Log.i("OF", "Display WideColor Gamut Supported:" +  isWideColorGamut);
-					OFAndroid.wideGamut = isWideColorGamut;
-
-					boolean isHDR = display.isHdr();
-					Log.i("OF", "Display is HDR Supported:" +  isHDR);
-					OFAndroid.hdrScreen = isHDR;
-				}
-
-				currentRefreshRate = display.getRefreshRate();
-				Log.i("OF", "Display Current RefreshRate :" +  currentRefreshRate);
-
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-					float[] refreshRates = display.getSupportedRefreshRates();
-					highestRefreshRate = currentRefreshRate;
-					for (float refreshRate : refreshRates) {
-						Log.i("OF", "Display RefreshRate Supported:" + refreshRate);
-						if (refreshRate > highestRefreshRate) {
-							highestRefreshRate = refreshRate;
-						}
-					}
-				}
-
-				OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
-				if(glView != null) {
-
-					DisplayMetrics displayMetrics = new DisplayMetrics();
-					getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
-					int height = displayMetrics.heightPixels;
-					int width = displayMetrics.widthPixels;
-					int bar = getNavigationBarHeight();
-					if(bar > 256) bar = 0;
-					int barWidth = getNavigationBarHeight();
-					if(barWidth > 256) barWidth = 0; // fixes bug in android display metrics
-					int heightBar = displayMetrics.heightPixels + bar;
-					int widthBar = displayMetrics.widthPixels + barWidth;
-					int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
-					int height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
-					int pixeldpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-					Log.i("OF", "DisplayMetrics: w/h:" +width + "x" + height + " barHeight:" + heightBar + "x barWidth:" + widthBar + " bar:" + bar + " widthBar:" + barWidth + " densityDPI:"  +pixeldpi);
-					Log.i("OF", "DisplayRealMetrics: w/h:" +width_px + "x" + height_px + " pixeldpi:" + pixeldpi);
-
-
-					glView.setWindowResize(widthBar, heightBar);
-				}
-				OFAndroid.deviceRefreshRate((int)currentRefreshRate);
-				OFAndroid.deviceHighestRefreshRate((int)highestRefreshRate);
+				DetermineDisplayConfiguration();
+				DetermineDisplayDimensions();
 			}
 		} catch(Exception exception) {
 			Log.w("OF", "onDisplayChanged Display Could not get Window for Display ", exception);
@@ -285,28 +285,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 		}
 
-		OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
-		if(glView != null) {
-
-			DisplayMetrics displayMetrics = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
-			int height = displayMetrics.heightPixels;
-			int width = displayMetrics.widthPixels;
-			int bar = getNavigationBarHeight();
-			int barWidth = getNavigationBarHeight();
-			int heightBar = displayMetrics.heightPixels + bar;
-			int widthBar = displayMetrics.widthPixels + barWidth;
-
-			int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
-			int height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
-			int pixeldpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-
-			Log.i("OF", "DisplayMetrics: w/h:" +width + "x" + height + " barHeight:" + heightBar + "x barWidth:" + widthBar + " bar:" + bar + " widthBar:" + barWidth + " densityDPI:"  +pixeldpi);
-			Log.i("OF", "DisplayRealMetrics: w/h:" +width_px + "x" + height_px + " pixeldpi:" + pixeldpi);
-
-			glView.setWindowResize(widthBar, heightBar);
-		}
-
+		DetermineDisplayConfiguration();
+		DetermineDisplayDimensions();
+		resetView();
 		//super.initView();
 	}
 
@@ -318,8 +299,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	private int getNavigationBarHeight() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
 			DisplayMetrics metrics = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 			int usableHeight = metrics.heightPixels;
+			getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
 			int realHeight = metrics.heightPixels;
 			if (realHeight > usableHeight)
 				return realHeight - usableHeight;
@@ -350,15 +332,24 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		super.onStart();
 		OFAndroidLifeCycle.glStart();
 
-		OFAndroid.deviceRefreshRate((int)currentRefreshRate);
-		OFAndroid.deviceHighestRefreshRate((int)highestRefreshRate);
+		try {
+			display = getWindowManager().getDefaultDisplay();
+			if (display.isValid()) {
+				DetermineDisplayConfiguration();
+			}
+
+		} catch(Exception exception) {
+			Log.w("OF", "onStart Display Could not get Window for Display ", exception);
+		}
+
 	}
 	
 	@Override
 	protected void onStop() {
 		Log.i("OF", "onStop");
-		super.onStop();
+		lastOrientation = getRequestedOrientation();
 		OFAndroidLifeCycle.glStop();
+		super.onStop();
 	}
 	
 	@Override
@@ -375,6 +366,7 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		OFAndroidLifeCycle.setActivity(this);
 		if(OFAndroidLifeCycle.isInit() && mOFGlSurfaceContainer == null) {
 			Log.i("OF", "onResume mOFGlSurfaceContainer is null");
+			resetView();
 		}
 		//resetView();
 		if(OFAndroidLifeCycle.isInit() && OFAndroidLifeCycle.getGLView() == null) {
@@ -382,29 +374,8 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 			OFAndroid.setupGL(OFAndroid.eglVersion, true);
 		}
 
-		OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
-		if(glView != null) {
-
-			DisplayMetrics displayMetrics = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
-			int height = displayMetrics.heightPixels;
-			int width = displayMetrics.widthPixels;
-			int bar = getNavigationBarHeight();
-			int barWidth = getNavigationBarHeight();
-			int heightBar = displayMetrics.heightPixels + bar;
-			int widthBar = displayMetrics.widthPixels + barWidth;
-
-			int width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
-			int height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
-			int pixeldpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-
-			Log.i("SuperHexagon", "DisplayMetrics: w/h:" +width + "x" + height + " barHeight:" + heightBar + "x barWidth:" + widthBar + " bar:" + bar + " widthBar:" + barWidth + " densityDPI:"  +pixeldpi);
-
-
-			glView.setWindowResize(widthBar, heightBar);
-		} else {
-			Log.e("OF", "onResume OFGLSurfaceView is null");
-		}
+		DetermineDisplayConfiguration();
+		DetermineDisplayDimensions();
 		OFAndroidLifeCycle.glResume(mOFGlSurfaceContainer);
 
 	}
