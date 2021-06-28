@@ -27,15 +27,22 @@ public class OFAndroidLifeCycleHelper
 	private static boolean appInitFlag = false;
 	private static boolean started;
 
+	private static boolean copyAssets = false;
+
 	public static void appInit(Activity activity)
 	{
 		if(appInitFlag)
 			return;
 		appInitFlag = true;
-		
+
+
 		copyAssetsToDataPath(activity);
 		
 		OFAndroid.init();
+	}
+
+	public static void setCopyAssets(boolean toCopyAssets) {
+		copyAssets = toCopyAssets;
 	}
 
 	private static void copyAssetsToDataPath(Activity activity) {
@@ -69,6 +76,10 @@ public class OFAndroidLifeCycleHelper
 			copydata = false;
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		if(copyAssets == false) {
+			copydata = copyAssets;
 		}
 
 
@@ -179,7 +190,10 @@ public class OFAndroidLifeCycleHelper
 			// and close the two files
 			srcIS.close();
 			destOS.close();
+
+			data = null;
 		}
+		destfh = null;
 	}
 
 
