@@ -26,6 +26,8 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
+import static android.opengl.EGL14.EGL_NO_CONTEXT;
+
 public abstract class OFActivity extends Activity implements DisplayManager.DisplayListener{
 
 	private DisplayManager displayManager;
@@ -34,6 +36,8 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 	public float currentRefreshRate;
 	public float highestRefreshRate;
+
+	public boolean hasPaused = false;
 
 	public void onGLSurfaceCreated(){}
 	public void onLoadPercent(float percent){}
@@ -237,6 +241,7 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	@Override
 	public void onDisplayChanged(int i) {
 		checkForPresentationDisplays();
+		if(hasPaused) return;
 		try {
 			display = getWindowManager().getDefaultDisplay();
 			if (display.isValid()) {
@@ -270,6 +275,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+
+		if(hasPaused) return;
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			Log.i("OF", "onConfigurationChanged() " + getRequestedOrientation() + " newConfig dpi:" + newConfig.densityDpi + " screenLayout:" + newConfig.screenLayout + " screenWidthDp:" + newConfig.screenWidthDp + " screenHeightDp:" + newConfig.screenHeightDp + " isScreenWideColorGamut:" + newConfig.isScreenWideColorGamut());
 		} else {
@@ -287,7 +295,7 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 		DetermineDisplayConfiguration();
 		DetermineDisplayDimensions();
-		resetView();
+		//resetView();
 		//super.initView();
 	}
 
@@ -347,13 +355,13 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	@Override
 	protected void onStop() {
 		Log.i("OF", "onStop");
-		lastOrientation = getRequestedOrientation();
 		OFAndroidLifeCycle.glStop();
 		super.onStop();
 	}
 	
 	@Override
 	protected void onRestart() {
+		OFAndroidLifeCycle.setActivity(this);
 		Log.i("OF", "onRestart");
 		super.onRestart();
 		OFAndroidLifeCycle.glRestart();
@@ -362,11 +370,22 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	@Override
 	protected void onResume() {
 		Log.i("OF", "onResume");
-		super.onResume();
 		OFAndroidLifeCycle.setActivity(this);
+		super.onResume();
+
+		if(hasPaused == false) return;
+		if(android.opengl.EGL14.eglGetCurrentContext() == EGL_NO_CONTEXT){
+			Log.e("OF", "onResume eglGetCurrentContext = EGL_NO_CONTEXT BAD");
+			hasPaused = true;
+			OFAndroidWindow.exit();
+			OFAndroidWindow.surfaceHasBeenDestroyed();
+			OFAndroid.setupGL(OFAndroid.eglVersion, true);
+		}
+
+
+
 		if(OFAndroidLifeCycle.isInit() && mOFGlSurfaceContainer == null) {
 			Log.i("OF", "onResume mOFGlSurfaceContainer is null");
-			resetView();
 		}
 		//resetView();
 		if(OFAndroidLifeCycle.isInit() && OFAndroidLifeCycle.getGLView() == null) {
@@ -376,6 +395,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 		DetermineDisplayConfiguration();
 		DetermineDisplayDimensions();
+		if(mOFGlSurfaceContainer == null) {
+			Log.e("OF", "onResume mOFGlSurfaceContainer is null - glCreateSurface");
+		}
 		OFAndroidLifeCycle.glResume(mOFGlSurfaceContainer);
 
 	}
@@ -383,6 +405,7 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	protected void onPause() {
 		Log.i("OF", "onPause");
 		super.onPause();
+		hasPaused = true;
 		OFAndroidLifeCycle.glPause();
 	}
 	@Override
