@@ -1,10 +1,12 @@
 package cc.openframeworks;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,11 +21,13 @@ import android.util.Log;
 import android.view.Display;
 import android.view.InputDevice;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
@@ -31,6 +35,7 @@ import static android.opengl.EGL14.EGL_NO_CONTEXT;
 
 public abstract class OFActivity extends Activity implements DisplayManager.DisplayListener{
 
+	private static final String STATE_KEY = "OF_STATE";
 	private DisplayManager displayManager;
 	private Display display;
 	private Display presentationDisplay;
@@ -38,10 +43,24 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	public float currentRefreshRate;
 	public float highestRefreshRate;
 
+	public int displayWidth;
+	public int displayHeight;
+
 	public boolean hasPaused = false;
+	public boolean hasResumed = false;
 
 	public void onGLSurfaceCreated(){
 		Log.v("OF","onGLSurfaceCreated");
+		if(hasResumed) {
+			OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
+			if(glView != null) {
+				glView.OnResume();
+			}
+			DetermineDisplayConfiguration();
+			DetermineDisplayDimensions();
+			hasResumed = false;
+		}
+
 	}
 	public void onLoadPercent(float percent){}
 	public void onUnpackingResourcesDone(){}
@@ -51,6 +70,7 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 	public ViewGroup getSurfaceContainer(){
 		return mOFGlSurfaceContainer;
 	}
+	private RelativeLayout mainView;
 
 
 	public void initView(){
@@ -58,25 +78,84 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
         try {
         	Log.v("OF","trying to find class: "+packageName+".R$layout");
 			Class<?> layout = Class.forName(packageName+".R$layout");
+
+
 			View view = this.getLayoutInflater().inflate(layout.getField("main_layout").getInt(null),null);
 			if(view == null) {
 				Log.w("OF", "Could not find main_layout.xml.");
 				throw new Exception();
 			}
-			this.setContentView(view);
-			
+			mainView = (RelativeLayout)view;
+			mainView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+			int mainViewW = mainView.getMeasuredWidth();
+			int mainViewH = mainView.getMeasuredHeight();
+
+			int width = getResources().getDisplayMetrics().widthPixels;
+			int height = getResources().getDisplayMetrics().heightPixels;
+
+
+			//mainView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+
+
 			Class<?> id = Class.forName(packageName+".R$id");
+			if(mOFGlSurfaceContainer != null) {
+				Log.w("OF", "initView mOFGlSurfaceContainer exists of_gl_surface_container in main_layout.xml");
+				mOFGlSurfaceContainer = null;
+			}
+			//View of_gl_surface_container = this.getLayoutInflater().inflate(layout.getField("of_gl_surface_container").getInt(null),null);
+
+
 			mOFGlSurfaceContainer = (ViewGroup)this.findViewById(id.getField("of_gl_surface_container").getInt(null));
-			
+			if(mOFGlSurfaceContainer == null) {
+				int count = mainView.getChildCount();
+				if(count > 0) {
+					View childView = mainView.getChildAt(0);
+					mOFGlSurfaceContainer = (ViewGroup)childView;
+				}
+			}
+
+//			mOFGlSurfaceContainer.setMinimumHeight(417);
+//			mOFGlSurfaceContainer.setMinimumWidth(417);
+//			mOFGlSurfaceContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+//			mOFGlSurfaceContainer.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//			int mOFGlSurfaceContainerW = mOFGlSurfaceContainer.getMeasuredWidth();
+//			int mOFGlSurfaceContainerH = mOFGlSurfaceContainer.getMeasuredHeight();
+//
+//			RelativeLayout preview = (RelativeLayout) mOFGlSurfaceContainer;
+//			ViewGroup.LayoutParams params = mOFGlSurfaceContainer.getLayoutParams();
+//
+//			params.width = width;
+//			params.height = height;
+//			preview.setLayoutParams(params);
+//
+//			RelativeLayout preview2 = (RelativeLayout) mainView;
+
+
+//			preview2.setLayoutParams(params);
+
+//			mainView.requestLayout();
+//			mOFGlSurfaceContainer.requestLayout();
 			if(mOFGlSurfaceContainer == null) {
 				Log.w("OF", "Could not find of_gl_surface_container in main_layout.xml. Copy main_layout.xml from latest empty example to fix this warning.");
 				throw new Exception();
 			}
-			
+
 		} catch (Exception e) {
-			Log.w("OF", "couldn't create view from layout falling back to GL only",e);
+			Log.e("OF", "couldn't create view from layout falling back to GL only",e);
 			mOFGlSurfaceContainer = new FrameLayout(this);
-	        this.setContentView(mOFGlSurfaceContainer);
+			mOFGlSurfaceContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+			//this.setContentView(mOFGlSurfaceContainer);
+			int mOFGlSurfaceContainerW = mOFGlSurfaceContainer.getMeasuredWidth();
+			int mOFGlSurfaceContainerH = mOFGlSurfaceContainer.getMeasuredHeight();
+
+			FrameLayout preview = (FrameLayout) mOFGlSurfaceContainer;
+			ViewGroup.LayoutParams params = mOFGlSurfaceContainer.getLayoutParams();
+			int width = getResources().getDisplayMetrics().widthPixels;
+			int height = getResources().getDisplayMetrics().heightPixels;
+			params.width = width;
+			params.height = height;
+			preview.setLayoutParams(params);
+			mOFGlSurfaceContainer.requestLayout();
 		}
 	}
 
@@ -99,6 +178,9 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 				Log.w("OF", "Could not find of_gl_surface_container in main_layout.xml. Copy main_layout.xml from latest empty example to fix this warning.");
 				throw new Exception();
 			}
+			this.setContentView(mOFGlSurfaceContainer);
+			mainView.requestLayout();
+			mOFGlSurfaceContainer.requestLayout();
 
 		} catch (Exception e) {
 			Log.w("OF", "couldn't create view from layout falling back to GL only",e);
@@ -109,25 +191,56 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 
 	private boolean create_first = true;
+	// some transient state for the activity instance
+	String appState;
 	
 	@Override
-	protected void onCreate(Bundle arg0) {
-		super.onCreate(arg0);
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// recovering the instance state
+		if (savedInstanceState != null) {
+			appState = savedInstanceState.getString(STATE_KEY);
+		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			displayManager = getSystemService(DisplayManager.class);
 			displayManager.registerDisplayListener(this, null);
 
 		}
+
+
+
 		OFAndroidLifeCycle.setActivity(this);
 		OFAndroidLifeCycle.init();
 		OFAndroidLifeCycle.glCreate();
 
+		initView();
+
 		DetermineDisplayConfiguration();
+		DetermineDisplayDimensions();
 
 		//create gesture listener
 		//register the two events
-		initView();
+
+	}
+
+	// This callback is called only when there is a saved instance that is previously saved by using
+	// onSaveInstanceState(). We restore some state in onCreate(), while we can optionally restore
+	// other state here, possibly usable after onStart() has completed.
+	// The savedInstanceState Bundle is same as the one used in onCreate().
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		//textView.setText(savedInstanceState.getString(TEXT_VIEW_KEY));
+	}
+
+	// invoked when the activity may be temporarily destroyed, save the instance state here
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString(STATE_KEY, appState);
+
+		// call superclass to save any view hierarchy
+		super.onSaveInstanceState(outState);
 	}
 
 	public void DetermineDisplayDimensions() {
@@ -151,6 +264,29 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 				Log.i("OF", "DisplayMetrics: w/h:" +width + "x" + height + " barHeight:" + heightBar + "x barWidth:" + widthBar + " bar:" + bar + " widthBar:" + barWidth + " densityDPI:"  +pixeldpi);
 				Log.i("OF", "DisplayRealMetrics: w/h:" +width_px + "x" + height_px + " pixeldpi:" + pixeldpi);
 				glView.setWindowResize(widthBar, heightBar);
+
+//				mOFGlSurfaceContainer.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//				int mainViewW = mOFGlSurfaceContainer.getMeasuredWidth();
+//				int mainViewH = mOFGlSurfaceContainer.getMeasuredHeight();
+//
+//				Log.i("OF", "mOFGlSurfaceContainer: w/h:" + mainViewW + "getMeasuredHeight" + mainViewH);
+
+
+//				mOFGlSurfaceContainer.setMinimumHeight(heightBar);
+//				mOFGlSurfaceContainer.setMinimumWidth(widthBar);
+//				mainView.setMinimumHeight(heightBar);
+//				mainView.setMinimumWidth(widthBar);
+//				mainView.setClipBounds(new Rect(0,0, widthBar, heightBar));
+//				mainView.forceLayout();
+//				mainView.requestLayout();
+//				mOFGlSurfaceContainer.requestLayout();
+
+				displayWidth = widthBar;
+				displayHeight = heightBar;
+
+				//Log.i("OF", "DisplayRealMetrics: w/h:" +mainView.getMeasuredWidth()  + "getMeasuredHeight" + mainView.getMeasuredHeight() + " min:w/h" + mainView.getMinimumWidth() + " h" + mainView.getMinimumHeight());
+
+
 			}
 		} catch (Exception exception) {
 			Log.w("OF", "Could not get Window for Display ", exception);
@@ -383,6 +519,10 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 		super.onRestart();
 		OFAndroidLifeCycle.glRestart();
 	}
+
+	public boolean isValidContext() {
+		return android.opengl.EGL14.eglGetCurrentContext() != EGL_NO_CONTEXT;
+	}
 	
 	@Override
 	protected void onResume() {
@@ -393,10 +533,29 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 		if(OFAndroidLifeCycle.isInit() == true && OFAndroidLifeCycle.firstFrameDrawn() == true && android.opengl.EGL14.eglGetCurrentContext() == EGL_NO_CONTEXT) {
 			hasPaused = true;
+			hasResumed = true;
 		}
 
 		if(OFAndroidLifeCycle.firstFrameDrawn()) {
 			Log.i("OF", "onResume firstFrameDrawn");
+		}
+
+		OFGLSurfaceView glView = OFAndroidLifeCycle.getGLView();
+		if(glView != null) {
+			glView.OnResume();
+			String packageName = this.getPackageName();
+			Class<?> id = null;
+//			try {
+//				id = Class.forName(packageName+".R$id");
+//
+//			} catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			} catch (NoSuchFieldException e) {
+//				e.printStackTrace();
+//			}
+
 		}
 
 		if( hasPaused == false) {
@@ -406,30 +565,38 @@ public abstract class OFActivity extends Activity implements DisplayManager.Disp
 
 		if(android.opengl.EGL14.eglGetCurrentContext() == EGL_NO_CONTEXT){
 			Log.e("OF", "onResume eglGetCurrentContext = EGL_NO_CONTEXT BAD");
-			OFAndroidWindow.exit();
-			OFAndroidWindow.surfaceHasBeenDestroyed();
-			OFAndroid.setupGL(OFAndroid.eglVersion, true);
+			hasResumed = true;
+
+
+			//OFAndroidLifeCycle.clearGLView();
+//			OFAndroidWindow.exit();
+//			OFAndroidWindow.surfaceHasBeenDestroyed();
+//			//resetView();
+//			OFAndroid.setupGL(OFAndroid.eglVersion, true);
 		}
 		if(OFAndroidLifeCycle.isInit() && mOFGlSurfaceContainer == null) {
 			Log.i("OF", "onResume mOFGlSurfaceContainer is null");
 		}
 		//
-		if(OFAndroidLifeCycle.isInit() && OFAndroidLifeCycle.getGLView() == null) {
-			Log.i("OF", "onResume getGLView is null - glCreateSurface");
-			OFAndroidWindow.exit();
-			OFAndroidWindow.surfaceHasBeenDestroyed();
-			OFAndroid.setupGL(OFAndroid.eglVersion, true);
+//		if(OFAndroidLifeCycle.isInit() && OFAndroidLifeCycle.getGLView() == null) {
+//			Log.i("OF", "onResume getGLView is null - glCreateSurface");
+//			OFAndroidWindow.exit();
+//			OFAndroidWindow.surfaceHasBeenDestroyed();
+//			OFAndroid.setupGL(OFAndroid.eglVersion, true);
+//		}
+
+
+		if(mOFGlSurfaceContainer == null) {
+			Log.e("OF", "onResume mOFGlSurfaceContainer is null - glCreateSurface");
 		}
 
 		DetermineDisplayConfiguration();
 		DetermineDisplayDimensions();
-		if(mOFGlSurfaceContainer == null) {
-			Log.e("OF", "onResume mOFGlSurfaceContainer is null - glCreateSurface");
-		}
+
 		OFAndroidLifeCycle.glResume(mOFGlSurfaceContainer);
 
-		hasPaused = false;
 
+		hasPaused = false;
 	}
 	@Override
 	protected void onPause() {

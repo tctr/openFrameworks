@@ -538,6 +538,10 @@ void ofGLProgrammableRenderer::viewport(ofRectangle viewport_){
 void ofGLProgrammableRenderer::viewport(float x, float y, float width, float height, bool vflip) {
 	matrixStack.viewport(x,y,width,height,vflip);
 	ofRectangle nativeViewport = matrixStack.getNativeViewport();
+
+	//ofLogNotice("viewport") << " x:" << x << " y:" << y << " width:" << width << " height:" << height << " vflip:" << vflip;
+	//ofLogNotice("nativeViewport") << " x:" << nativeViewport.x << " y:" << nativeViewport.y << " width:" << nativeViewport.width << " height:" << nativeViewport.height;
+
 	glViewport(nativeViewport.x,nativeViewport.y,nativeViewport.width,nativeViewport.height);
 }
 
@@ -586,16 +590,23 @@ void ofGLProgrammableRenderer::setOrientation(ofOrientation orientation, bool vF
 //----------------------------------------------------------
 void ofGLProgrammableRenderer::setupScreenPerspective(float width, float height, float fov, float nearDist, float farDist) {
 	float viewW, viewH;
-	if(width<0 || height<0){
+	if(width<=1 || height<1){
 		ofRectangle currentViewport = getCurrentViewport();
 
 		viewW = currentViewport.width;
 		viewH = currentViewport.height;
+		ofLogError("OFD") << "setupScreenPerspective passed 0! w:" << width << " h:" << height << " viewW:" << viewW << " viewH:" << viewH;
+
 	}else{
 		viewW = width;
 		viewH = height;
 	}
 
+	if(viewH < 1 && viewW < 1) {
+		viewH = 1; viewW = 1;
+	}
+
+	ofLogNotice("OFD") << "setupScreenPerspective w:" << width << " h:" << height << " viewW:" << viewW << " viewH:" << viewH;
 	float eyeX = viewW / 2;
 	float eyeY = viewH / 2;
 	float halfFov = PI * fov / 360;
@@ -620,7 +631,7 @@ void ofGLProgrammableRenderer::setupScreenPerspective(float width, float height,
 //----------------------------------------------------------
 void ofGLProgrammableRenderer::setupScreenOrtho(float width, float height, float nearDist, float farDist) {
 	float viewW, viewH;
-	if(width<0 || height<0){
+	if(width<1 || height<1){
 		ofRectangle currentViewport = getCurrentViewport();
 
 		viewW = currentViewport.width;
@@ -2475,7 +2486,7 @@ void ofGLProgrammableRenderer::setup(int _major, int _minor){
 	}
 
 	setupGraphicDefaults();
-	viewport();
+	viewport(0,0 );
 	setupScreenPerspective();
 }
 

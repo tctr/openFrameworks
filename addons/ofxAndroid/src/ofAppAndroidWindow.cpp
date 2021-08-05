@@ -37,8 +37,10 @@ static ofAppAndroidWindow * window;
 static ofOrientation orientation = OF_ORIENTATION_DEFAULT;
 
 static queue<ofTouchEventArgs> touchEventArgsQueue;
+static queue<ofKeyEventArgs> keyEventArgsQueue;
 static std::mutex mtx;
 static bool threadedTouchEvents = false;
+static bool threadedKeyEvents = false;
 static bool appSetup = false;
 static bool accumulateTouchEvents = false;
 
@@ -117,6 +119,7 @@ ofAppAndroidWindow::ofAppAndroidWindow(){
 
 ofAppAndroidWindow::~ofAppAndroidWindow() {
 	// TODO Auto-generated destructor stub
+	ofLogError("~ofAppAndroidWindow") << "Destroying Window width:" << sWindowWidth << " height:" << sWindowHeight;
 }
 
 bool ofAppAndroidWindow::isSurfaceDestroyed() {
@@ -296,11 +299,13 @@ Java_cc_openframeworks_OFAndroid_setAppDataDir( JNIEnv*  env, jclass thiz, jstri
 
 void Java_cc_openframeworks_OFAndroid_init( JNIEnv*  env, jclass  clazz)
 {
+	ofLogVerbose("ofAppAndroidWindow") << "init";
 	ofAndroidApplicationInit();
 }
 
 void Java_cc_openframeworks_OFAndroid_onCreate( JNIEnv*  env, jclass  clazz)
 {
+	ofLogVerbose("ofAppAndroidWindow") << "onCreate";
 	ofAndroidActivityInit();
 }
 
@@ -340,6 +345,7 @@ Java_cc_openframeworks_OFAndroid_onPause( JNIEnv*  env, jclass thiz){
 
 void
 Java_cc_openframeworks_OFAndroid_onDestroy( JNIEnv*  env, jclass  thiz ){
+	ofLogVerbose("ofAppAndroidWindow") << "onDestroy - appSetup = false";
 	appSetup = false;
 	ofEvents().notifyExit();
 	ofExitCallback();
@@ -355,11 +361,13 @@ Java_cc_openframeworks_OFAndroid_onSurfaceDestroyed( JNIEnv*  env, jclass  thiz 
 
 void
 Java_cc_openframeworks_OFAndroid_onSurfaceCreated( JNIEnv*  env, jclass  thiz ){
+	ofLogVerbose("ofAppAndroidWindow") << "onSurfaceCreated" << " appSetup:" << appSetup << " surfaceDestroyed:" << surfaceDestroyed;
 	if(appSetup){
-		ofLogVerbose("ofAppAndroidWindow") << "onSurfaceCreated";
 		if(!surfaceDestroyed){
+			ofLogVerbose("ofAppAndroidWindow") << "onSurfaceCreated : !surfaceDestroyed - unloadGL Now?";
 			ofNotifyEvent(ofxAndroidEvents().unloadGL);
 		}
+
 		ofNotifyEvent(ofxAndroidEvents().reloadGL);
 		window->renderer()->pushStyle();
 		window->renderer()->setupGraphicDefaults();
@@ -375,7 +383,11 @@ Java_cc_openframeworks_OFAndroid_onSurfaceCreated( JNIEnv*  env, jclass  thiz ){
 		else
 		{
 			ofLogVerbose("ofAppAndroidWindow") << "onSurfaceCreated OpenGLES 2.0";
-			static_cast<ofGLProgrammableRenderer*>(window->renderer().get())->setup(glesVersion,0);
+			ofGLProgrammableRenderer* renderer = static_cast<ofGLProgrammableRenderer*>(window->renderer().get());
+			renderer->viewport(0,0, sWindowWidth, sWindowHeight);
+			renderer->setupScreenPerspective(sWindowWidth, sWindowHeight);
+			renderer->setup(glesVersion,0);
+
 		}
 
 	}else{
@@ -389,8 +401,15 @@ Java_cc_openframeworks_OFAndroid_onSurfaceCreated( JNIEnv*  env, jclass  thiz ){
 		else
 		{
 			ofLogVerbose("ofAppAndroidWindow") << "onSurfaceCreated OpenGLES 2.0";
-			static_cast<ofGLProgrammableRenderer*>(window->renderer().get())->setup(glesVersion,0);
+			ofGLProgrammableRenderer* renderer = static_cast<ofGLProgrammableRenderer*>(window->renderer().get());
+			renderer->viewport(0,0, sWindowWidth, sWindowHeight);
+			renderer->setupScreenPerspective(sWindowWidth, sWindowHeight);
+			renderer->setup(glesVersion,0);
+
+			ofLogVerbose("ofAppAndroidWindow") << "view port:" << renderer->getCurrentViewport() << " viewMatrix:" << renderer->getCurrentViewMatrix();
 		}
+
+
 	}
 
 	surfaceDestroyed = false;
@@ -403,14 +422,14 @@ Java_cc_openframeworks_OFAndroid_setup( JNIEnv*  env, jclass  thiz, jint w, jint
 	stopped = false;
     sWindowWidth  = w;
     sWindowHeight = h;
-	window->renderer()->startRender();
+	//window->renderer()->startRender();
 	if(bSetupScreen) {
 		window->renderer()->setupScreen();
 		bSetupScreen = false;
 	}
 
 	window->events().notifySetup();
-	window->renderer()->finishRender();
+	//window->renderer()->finishRender();
 	appSetup = true;
 }
 
@@ -438,15 +457,20 @@ void
 Java_cc_openframeworks_OFAndroid_render( JNIEnv*  env, jclass  thiz )
 {
 
-	if(stopped || surfaceDestroyed) {
+	if(stopped || surfaceDestroyed || window->renderer() == nullptr) {
         ofLogVerbose("ofAppAndroidWindow") << "OFAndroid_render  stopped:" << stopped << "surfaceDestroyed" << surfaceDestroyed;
-	    return;
+//	    return;
 	}
 
 	if(!threadedTouchEvents){
+
 		mtx.lock();
 		queue<ofTouchEventArgs> events = touchEventArgsQueue;
 		while(!touchEventArgsQueue.empty()) touchEventArgsQueue.pop();
+
+		queue<ofKeyEventArgs> keyEvents = keyEventArgsQueue;
+		while(!keyEventArgsQueue.empty()) keyEventArgsQueue.pop();
+
 		mtx.unlock();
 
 		while(!events.empty()){

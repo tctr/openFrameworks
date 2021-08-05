@@ -6,7 +6,9 @@ ofFpsCounter::ofFpsCounter()
 ,fps(0)
 ,lastFrameTime(0)
 ,filteredTime(0)
-,filterAlpha(0.9){}
+,filterAlpha(0.9){
+	timestamps.resize(60);
+}
 
 
 
@@ -16,12 +18,14 @@ ofFpsCounter::ofFpsCounter(double targetFPS)
 ,fps(targetFPS)
 ,lastFrameTime(0)
 ,filteredTime(0)
-,filterAlpha(0.9){}
+,filterAlpha(0.9){
+	timestamps.resize(targetFPS);
+}
 
 void ofFpsCounter::newFrame(){
 	auto now = ofGetCurrentTime();
 	update(now.getAsSeconds());
-	timestamps.push(now.getAsSeconds());
+	timestamps.push_back(now.getAsSeconds());
 
 	lastFrameTime = now - then;
 	uint64_t filtered = filteredTime.count() * filterAlpha + lastFrameTime.count() * (1-filterAlpha);
@@ -37,7 +41,7 @@ void ofFpsCounter::update(){
 
 void ofFpsCounter::update(double now){
 	while(!timestamps.empty() && timestamps.front() + 2 < now){
-		timestamps.pop();
+		timestamps.pop_front();
 	}
 
 	auto diff = 0.0;
