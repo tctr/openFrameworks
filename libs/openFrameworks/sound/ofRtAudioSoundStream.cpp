@@ -1,3 +1,4 @@
+#if defined(OF_RTAUDIO)
 #include "ofRtAudioSoundStream.h"
 #include "ofMath.h"
 #include "ofUtils.h"
@@ -316,3 +317,4 @@ int ofRtAudioSoundStream::rtAudioCallback(void *outputBuffer, void *inputBuffer,
 
 	return 0;
 }
+#endif
