@@ -6,9 +6,9 @@ project(ofapp LANGUAGES CXX)
 set(TARGET_ANDROID TRUE)
 
 set(LOCAL_PATH ${CMAKE_SOURCE_DIR})
-set(PRJ_OF_ROOT ${LOCAL_PATH}/../../../../../../../)
+set(PRJ_OF_ROOT ${LOCAL_PATH}/../../../../../../)
 
-set(PURE_OF_ROOT ${LOCAL_PATH}/../../../../../../../)
+set(PURE_OF_ROOT ${LOCAL_PATH}/../../../../../../)
 set(CORE_OF_ROOT ${PURE_OF_ROOT}/libs/openFrameworks)
 set(LIBS_ROOT ${PURE_OF_ROOT}/libs)
 

@@ -2,12 +2,12 @@ plugins {
     id 'com.android.application'
 }
 
-def CMAKELIST_PATH = './src/main/cpp'
-def CPP_SOURCE = './src/main/cpp'
-def JAVA_SOURCE = './src/main/java'
+def CMAKELIST_PATH = './src/cpp'
+def CPP_SOURCE = './src/cpp'
+def JAVA_SOURCE = './src/java'
 
 // pointing to cmake's source code for the same project
-def PRJ_SRC_ROOT = './src/main'
+def PRJ_SRC_ROOT = './src'
 def ofRoot(){ return '../../../../' }
 final ofSource = ofRoot() + 'libs/openFrameworks'
 final ofLibs = ofRoot() + 'libs'
@@ -120,7 +120,7 @@ android {
             res.srcDirs = ["${PRJ_SRC_ROOT}/res"]
 //          jniLibs.srcDirs = ["${OF_ANDROID_OUTPUT}", "lib"] // Pre Android Studio 2022.2.1
             assets {
-                srcDirs 'src/main/assets', 'src/main/bin/data'
+                srcDirs 'src/assets', 'src/bin/data'
             }
         }
     }
