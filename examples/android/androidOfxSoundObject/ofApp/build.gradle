@@ -53,11 +53,11 @@ android {
         }
     }
     defaultConfig {
-        applicationId "cc.openframeworks.androidEmptyExample"  // IMPORTANT : THIS DEFINES THE ID OF THE APK
+        applicationId "cc.openframeworks.androidOfxSoundObject"  // IMPORTANT : THIS DEFINES THE ID OF THE APK
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 12
-        versionName '12.0'
+        versionCode 1
+        versionName '1.0.0'
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' //, 'x86_64'
 
         externalNativeBuild {
