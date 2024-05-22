@@ -22,6 +22,16 @@ set(OF_ANDROID_OUTPUT ${PURE_OF_ROOT}/libs/openFrameworksCompiled/lib/android)
 set(PRJ_OFX_ANDROID_PATH ${PRJ_ADDONS_PATH}/ofxAndroid)
 set(PRJ_OFX_ANDROID_CPP_PATH ${PRJ_OFX_ANDROID_PATH}/src)
 
+set(PRJ_OFX_SOUNDOBJECT_PATH ${PRJ_ADDONS_PATH}/ofxSoundObject)
+set(PRJ_OFX_SOUNDOBJECT_CPP_PATH ${PRJ_OFX_SOUNDOBJECT_PATH}/src)
+
+set(PRJ_OFX_AUDIOFILE_PATH ${PRJ_ADDONS_PATH}/ofxAudioFile)
+set(PRJ_OFX_AUDIOFILE_CPP_PATH ${PRJ_OFX_AUDIOFILE_PATH}/src)
+
+set(PRJ_OFX_GUI_PATH ${PRJ_ADDONS_PATH}/ofxGui)
+set(PRJ_OFX_GUI_CPP_PATH ${PRJ_OFX_GUI_PATH}/src)
+
+
 macro(print_all_variables)
     message(STATUS "print_all_variables------------------------------------------{")
     get_cmake_property(_variableNames VARIABLES)
@@ -64,8 +74,41 @@ print_all_variables()
 add_library( ofapp #name
         SHARED # type of library
         # src files for project (just c/cpp)
+
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxMultiSoundPlayer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSingleSoundPlayer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundFile.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundMatrixMixer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundMixer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundMultiplexer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundObject.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundRecorderObject.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundSpliter.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/ofxSoundUtils.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/Renderers/ofx2DCanvas.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/Renderers/ofxSlidersGrid.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/Renderers/ofxSoundObjectBaseRenderer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/Renderers/ofxSoundObjectMatrixMixerRenderer.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/SoundObjects/Panner.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/SoundObjects/VUMeter.cpp
+        ${PRJ_OFX_SOUNDOBJECT_CPP_PATH}/SoundObjects/waveformDraw.cpp
+
+        ${PRJ_OFX_AUDIOFILE_CPP_PATH}/ofxAudioFile.cpp
+
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxBaseGui.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxButton.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxColorPicker.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxGuiGroup.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxInputField.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxLabel.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxPanel.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxSlider.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxSliderGroup.cpp
+        ${PRJ_OFX_GUI_CPP_PATH}/ofxToggle.cpp
+
         ${CMAKE_SOURCE_DIR}/main.cpp
         ${CMAKE_SOURCE_DIR}/ofApp.cpp
+
         )
 
 
@@ -89,6 +132,12 @@ include_directories(
         ${PURE_OF_ROOT}/addons/ofxAccelerometer/src
         ${PURE_OF_ROOT}/addons/ofxXmlSettings/src
         ${PURE_OF_ROOT}/addons/ofxXmlSettings/libs
+        ${PURE_OF_ROOT}/addons/ofxSoundObject/src
+        ${PURE_OF_ROOT}/addons/ofxSoundObject/src/SoundObjects
+        ${PURE_OF_ROOT}/addons/ofxSoundObject/src/Renderers
+        ${PURE_OF_ROOT}/addons/ofxAudioFile/src
+        ${PURE_OF_ROOT}/addons/ofxAudioFile/libs
+        ${PURE_OF_ROOT}/addons/ofxGui/src
         # openFrameworks Libs includes
         ${PRJ_LIBS_ROOT}/FreeImage/include
         ${PRJ_LIBS_ROOT}/freetype/include
@@ -109,20 +158,20 @@ include_directories(
 
 find_library(android-lib android)
 find_library(log-lib log)
-find_library(GLES2-lib GLESv2)
-
-#find_library(GLES1-lib GLESv1_CM)
+find_library(GLES1-lib GLESv1_CM)
+#find_library(GLES2-lib GLESv2)
 #find_library(GLES3-lib GLESv3)
 
 
 target_link_libraries(ofapp
         EGL
-        GLESv2
         log
         c
         m
         z
         dl
+        GLESv1_CM
+#        GLESv2
 #        GLESv3
         )
 
