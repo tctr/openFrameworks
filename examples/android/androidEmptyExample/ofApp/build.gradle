@@ -56,14 +56,15 @@ android {
         applicationId "cc.openframeworks.androidEmptyExample"  // IMPORTANT : THIS DEFINES THE ID OF THE APK
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 12
-        versionName '12.0'
-        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' //, 'x86_64'
+        versionCode 1
+        versionName '1.0.0'
+        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a' //, 'x86', 'x86_64'
 
         externalNativeBuild {
             if (!project.hasProperty("ndkBuild")) {
                 cmake {
                     arguments "-DANDROID_STL=c++_shared",
+                              "-DANDROID_ABI=arm64-v8a",
                             "-DANDROID_ARM_NEON=TRUE",
                             "-DANDROID_TOOLCHAIN=clang",
                             //"${OF_ADDONS_ARGUMENTS}",
@@ -80,8 +81,8 @@ android {
             signingConfig signingConfigs.release
             jniDebuggable false
             debuggable false
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
