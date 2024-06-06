@@ -16,6 +16,10 @@ void ofApp::setup(){
 	captureBg = true;
 }
 
+void ofApp::exit(){
+
+}
+
 //--------------------------------------------------------------
 void ofApp::update(){
 	grabber.update();
@@ -48,13 +52,13 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed  (int key){
-
+void ofApp::keyPressed  (int key){ 
+	
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
+void ofApp::keyReleased(int key){ 
+	
 }
 
 //--------------------------------------------------------------
@@ -124,5 +128,21 @@ void ofApp::okPressed(){
 
 //--------------------------------------------------------------
 void ofApp::cancelPressed(){
+
+}
+
+void ofApp::deviceRefreshRateChanged(int refreshRate) {
+
+}
+
+void ofApp::deviceHighestRefreshRateChanged(int refreshRate) {
+
+}
+
+void ofApp::deviceRefreshRateChangedEvent(int &refreshRate) {
+
+}
+
+void ofApp::deviceHighestRefreshRateChangedEvent(int &refreshRate) {
 
 }

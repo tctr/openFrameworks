@@ -10,9 +10,10 @@ class ofApp : public ofxAndroidApp{
 	public:
 		
 		void setup();
+		void exit();
 		void update();
 		void draw();
-
+		
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void windowResized(int w, int h);
@@ -33,6 +34,10 @@ class ofApp : public ofxAndroidApp{
 		void okPressed();
 		void cancelPressed();
 
+        void deviceRefreshRateChanged(int refreshRate);
+        void deviceHighestRefreshRateChanged(int refreshRate);
+        void deviceRefreshRateChangedEvent(int &refreshRate);
+        void deviceHighestRefreshRateChangedEvent(int & refreshRate);
 		ofVideoGrabber grabber;
 		ofxCvGrayscaleImage gray, bg;//, diff;
 		ofxCvContourFinder contourFinder;
@@ -42,5 +47,4 @@ class ofApp : public ofxAndroidApp{
 		float one_second_time;
 		float camera_fps;
 		float frames_one_sec;
-
 };
