@@ -6,11 +6,15 @@
 #include "ofxOpenCv.h"
 #include <vector>
 
+//UNCOMMENT TO USE CAMERA. CAMERA ONLY WORKS ON DEVICE NOT SIMULATOR
+#define USE_CAMERA
+
 class ofApp : public ofxAndroidApp{
 	
 	public:
 		
 		void setup();
+		void exit();
 		void update();
 		void draw();
 
@@ -34,11 +38,22 @@ class ofApp : public ofxAndroidApp{
 		void okPressed();
 		void cancelPressed();
 
-		ofVideoGrabber grabber;
+        void deviceRefreshRateChanged(int refreshRate);
+        void deviceHighestRefreshRateChanged(int refreshRate);
+        void deviceRefreshRateChangedEvent(int &refreshRate);
+        void deviceHighestRefreshRateChangedEvent(int & refreshRate);
+				
+		ofImage img;
+		
+		#ifdef USE_CAMERA
+			ofVideoGrabber grabber;
+		#endif
 		ofxCvColorImage colorCv;
 		ofxCvColorImage colorCvSmall;
 		ofxCvGrayscaleImage grayCv;
 		ofxCvHaarFinder faceFinder;
+		ofImage colorImg;
+		
 		std::vector<ofxCvBlob> faces;
 
 		int one_second_time;
