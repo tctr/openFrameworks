@@ -1,3 +1,5 @@
+### What is this repo and branch Android_fixes_thierry ?
+
 This is a fork of **Dan Rosser (@danoli3)** own fork of openFrameworks [https://github.com/danoli3/openFrameworks](https://github.com/danoli3/openFrameworks) that I've used to experiment with OF on Android with **modern Android tools**. Dan has indeed rearchitectured the way the OF build for Android can be done.
 
 Default branch is **Android_fixes_thierry**, starting from Dan's **Android_fixes**.
@@ -9,7 +11,10 @@ I added :
 
 I have added these binaries for convenience because current **download_libs.sh** under **scripts/android** does not fully work and I had to manually include some the binaries in the right places with the right names. That will need to be fixed.
 
-The composite example includes ofShaderExample, ofSoundPlayerExample, ofSoundStreamExample. It was constructed starting by **manually copying** the following project : **scripts/template/android** under example/android. **ProjectGenerator was not used.**
+
+### Building openFrameworks Android lib and composite example
+
+The composite example includes `ofShaderExample` `ofSoundPlayerExample` `ofSoundStreamExample`. It was constructed starting by **manually copying** the following project : **scripts/template/android** under example/android. **ProjectGenerator was not used.**
 
 To make a build, start by **building the openFrameworks lib** for Android by :
 - opening the following project in Android Studio : **libs/openFrameworksCompiled/project/android**
@@ -27,10 +32,47 @@ It is then possible to build the example and generate the corresponding APK / bu
 - then launch **build / build bundle / apk / your choice** to **generate an apk or a bundle** in **ofApp/build/output**
 - with a connected device you can upload and lauch the app
 
+### Additional examples : how to
+To build additional examples modify with your destination directory and launch the following file : `./scripts/android/create_hierarchy_emptyExample.sh`
 
-The version of Android Studio that I have used is **Android Studio Flamingo | 2022.2.1 Patch 1**
+This creates the file hierarchy needed to build Android example using CMake and Android Studio.
 
-That was tested on a Xiaomi MI lite 10 from 2020, runnning **Android 10, SDK 29**.
+Then :
+- replace the app files `ofApp.h` `ofApp.cpp` eventually `main.cpp`
+- change the name of the app in `ofApp/src/amin/res/values*/strings.xml`
+- change the application ID in `ofApp/build.gradle` => example :
+ ```  
+ defaultConfig {
+        applicationId "cc.openframeworks.androidCameraExample"  // IMPORTANT : THIS DEFINES THE ID OF THE APK
+```
+- change android permissions in `AndroidManifest.xml`
+- Add additional include and cpp files in `CMakeLists.txt` as well as links to additional lib binaries if necessary (see `androidOfxSoundObject` example)
+- in `androidOfxSoundObject` example, I had to link to GLES1 instead of GLES2 in `CMakeLists.txt`
+- change Java activity if necessary
+
+### Built and tested examples so far as of today (2024/06/20)
+- `androidEmptyExample`
+- `androidCompositeExample` : mixes `androidShaderExample` `androidSoundPlayerExample` `androidSoundStreamExample`
+- `androidCameraExample`
+- `androidOfxSoundObject` with `ofxSoundObjects` addon
+- `androidOpenCVExample`
+- `androidOpenCVFaceExample`
+
+
+### Special case : ofxOpenCv examples
+
+For `ofxOpenCv` I created an Android Studio project in addons/ofxOpenCv/android which generates a `libofxOpenCVAndroid.so` lib in `addons/ofxOpenCv/libs/android` for `arm64-v8a` and `armeabi-v7a`. This project replicates the solution that **Dan @danoli3** uses to generate the `libopenFrameworksAndroid.so`
+
+`libofxOpenCVAndroid.so` can be linked in all openCV examples without recompiling it each time.
+
+In CMake I don't use the `find_package(OPENCV)` instructions but build straight from the opencv lib folders under `ofxOpenCv`. I generated the libs using apocathery. Here is a small howto for those interested [building_opencv_for_android](./Docs/building_opencv_for_android.md).
+
+### Tests and Play Store
+- The version of Android Studio that I have used is **Android Studio Flamingo | 2022.2.1 Patch 1**
+
+- That was tested on a Xiaomi MI lite 10 from 2020, runnning **Android 10, SDK 29**.
+
+- I managed to **upload a demo app** for internal testing on the **Play Store** `com.tctr.marscollege`. I still have **one last accessibility warning**, but that's the only one. App is doing ok on different kind of devices.
 
 
 [openFrameworks](http://openframeworks.cc/)
